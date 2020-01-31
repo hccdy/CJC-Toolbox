@@ -1,0 +1,53 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:s="clr-namespace:System;assembly=mscorlib">
+    <s:String x:Key="MainTitle">蒟蒻果冻charlieyan的工具箱</s:String>
+    <s:String x:Key="CJCAMMtitle">蒟蒻果冻charlieyan的高级MIDI合并工具</s:String>
+    <s:String x:Key="Add">添加</s:String>
+    <s:String x:Key="Remove">删除</s:String>
+    <s:String x:Key="Clear">清空</s:String>
+    <s:String x:Key="Settings">设置</s:String>
+    <s:String x:Key="Info">文件信息</s:String>
+    <s:String x:Key="SaveGroup">保存组</s:String>
+    <s:String x:Key="LoadGroup">加载组</s:String>
+    <s:String x:Key="Start">开始!</s:String>
+    <s:String x:Key="Save">保存!</s:String>
+    <s:String x:Key="InfoWindowtitle">Midi信息</s:String>
+    <s:String x:Key="StartWindowtitle">开始合并</s:String>
+    <s:String x:Key="MergingMidis">Midi合并中...</s:String>
+    <s:String x:Key="Setppq">设置PPQ</s:String>
+    <s:String x:Key="ImpBpm">将BPM事件合并到同一个音轨</s:String>
+    <s:String x:Key="ImpMrg">将所有事件合并到同一个音轨</s:String>
+    <s:String x:Key="RemBpm">删除所有BPM事件</s:String>
+    <s:String x:Key="RemPC">删除所有乐器变更事件</s:String>
+    <s:String x:Key="RemPB">删除所有弯音事件</s:String>
+    <s:String x:Key="RemEpt">删除空音轨</s:String>
+    <s:String x:Key="TrsPpq">将原PPQ转换至目标PPQ</s:String>
+    <s:String x:Key="Offst">设置延迟 (时间戳数)</s:String>
+    <s:String x:Key="MinvolFront">删除所有音量不大于</s:String>
+    <s:String x:Key="MinvolBack">的音符</s:String>
+    <s:String x:Key="OKkey">确认</s:String>
+    <s:String x:Key="Filename">文件名:&#160;</s:String>
+    <s:String x:Key="Filesize">文件大小 (字节):&#160;</s:String>
+    <s:String x:Key="Trkcnt">音轨数:&#160;</s:String>
+    <s:String x:Key="OriginalPpq">原PPQ:&#160;</s:String>
+    <s:String x:Key="Notecount">音符数:&#160;</s:String>
+    <s:String x:Key="Midilen">Midi长度 (时间戳数):&#160;</s:String>
+    <s:String x:Key="Getmoreinfo">获取更多信息</s:String>
+    <s:String x:Key="Finished">完成</s:String>
+    <s:String x:Key="Parsingtrack">读取第{trackcount}个音轨，{tracksize}字节</s:String>
+    <s:String x:Key="UnableGroup">无法获取组文件的更多信息</s:String>
+    <s:String x:Key="Clickgetinfo">(点击下方"获取更多信息"以获取)</s:String>
+    <s:String x:Key="ProcessedTracks">已处理{trks}音轨, 写入{wrtt}音轨...</s:String>
+    <s:String x:Key="clearwarn">确定要清空?</s:String>
+    <s:String x:Key="Lang">语言:</s:String>
+    <s:String x:Key="CJCAMMInfo" xml:space="preserve">蒟蒻果冻charlieyan的高级MIDI合并工具&#10;一个用来合并多个MIDI的工具，也可以用来获取MIDI信息。&#10;由花抄抄大爷制作。</s:String>
+    <s:String x:Key="CJCORInfo" xml:space="preserve">蒟蒻果冻charlieyan的MIDI重叠去除工具&#10;一个用来去除MIDI中重叠音符但是不影响视觉效果的软件。&#10;由花抄抄大爷制作。</s:String>
+    <s:String x:Key="Version" xml:space="preserve">版本号:&#32;</s:String>
+    <s:String x:Key="CJCORtitle">蒟蒻果冻charlieyan的MIDI重叠去除工具</s:String>
+    <s:String x:Key="AudioRender">使用高音质模式 (音质更高，但速度更慢)</s:String>
+    <s:String x:Key="NotesRemain" xml:space="preserve">剩余音符数:&#32;</s:String>
+    <s:String x:Key="OverlapRate" xml:space="preserve">比率:&#32;</s:String>
+    <s:String x:Key="Prereading">预读取第{trackcount}个音轨</s:String>
+    <s:String x:Key="SuccessfullyOutput" xml:space="preserve">成功将文件输出至</s:String>
+</ResourceDictionary>

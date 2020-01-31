@@ -1,0 +1,53 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:s="clr-namespace:System;assembly=mscorlib">
+    <s:String x:Key="MainTitle">Conjac Jelly Charlieyan's Toolbox</s:String>
+    <s:String x:Key="CJCAMMtitle">Conjac Jelly Charlieyan's Advanced Midi Merger</s:String>
+    <s:String x:Key="Add">Add</s:String>
+    <s:String x:Key="Remove">Remove</s:String>
+    <s:String x:Key="Clear">Clear</s:String>
+    <s:String x:Key="Settings">Settings</s:String>
+    <s:String x:Key="Info">Info</s:String>
+    <s:String x:Key="SaveGroup">Save Group</s:String>
+    <s:String x:Key="LoadGroup">Load Group</s:String>
+    <s:String x:Key="Start">Start!</s:String>
+    <s:String x:Key="Save">Save!</s:String>
+    <s:String x:Key="StartWindowtitle">Start Merge</s:String>
+    <s:String x:Key="InfoWindowtitle">Midi Information</s:String>
+    <s:String x:Key="MergingMidis">Merging Midis...</s:String>
+    <s:String x:Key="Setppq">Set PPQ</s:String>
+    <s:String x:Key="ImpBpm">Implace merge BPM to the first track</s:String>
+    <s:String x:Key="ImpMrg">Implace merge everything to a single track</s:String>
+    <s:String x:Key="RemBpm">Remove all BPM events</s:String>
+    <s:String x:Key="RemPC">Remove all program change events (Set all instruments to piano)</s:String>
+    <s:String x:Key="RemPB">Remove all pitch bend events</s:String>
+    <s:String x:Key="RemEpt">Remove empty tracks</s:String>
+    <s:String x:Key="TrsPpq">Convert the original PPQ to the main PPQ</s:String>
+    <s:String x:Key="Offst">Set offset (ticks)</s:String>
+    <s:String x:Key="MinvolFront">Remove notes with volume not greater than</s:String>
+    <s:String x:Key="MinvolBack">&#160;</s:String>
+    <s:String x:Key="OKkey">OK</s:String>
+    <s:String x:Key="Filename">File name:&#160;</s:String>
+    <s:String x:Key="Filesize">File size (bytes):&#160;</s:String>
+    <s:String x:Key="Trkcnt">Track count:&#160;</s:String>
+    <s:String x:Key="OriginalPpq">Original PPQ:&#160;</s:String>
+    <s:String x:Key="Notecount">Note count:&#160;</s:String>
+    <s:String x:Key="Midilen">Midi length (ticks):&#160;</s:String>
+    <s:String x:Key="Getmoreinfo">Get more information</s:String>
+    <s:String x:Key="Finished">Finished.</s:String>
+    <s:String x:Key="Parsingtrack">Parsing track {trackcount}, {tracksize} bytes</s:String>
+    <s:String x:Key="UnableGroup">Unable to get more information on group files</s:String>
+    <s:String x:Key="Clickgetinfo">(Click "Get more information" below to get)</s:String>
+    <s:String x:Key="ProcessedTracks">Processed {trks} tracks, written {wrtt} tracks...</s:String>
+    <s:String x:Key="clearwarn">Do you really want to clear the list?</s:String>
+    <s:String x:Key="Lang">Language:</s:String>
+    <s:String x:Key="CJCAMMInfo" xml:space="preserve">Conjac Jelly Charlieyan's Advanced Midi Merger&#10;A software used to merge several MIDIs and show the information of a MIDI.&#10;Made by HuaChaoChaoDaYe.</s:String>
+    <s:String x:Key="CJCORInfo" xml:space="preserve">Conjac Jelly Charlieyan's Overlap Remover&#10;A software used to remove the overlaps in a MIDI.&#10;Made by HuaChaoChaoDaYe.</s:String>
+    <s:String x:Key="Version" xml:space="preserve">Version&#32;</s:String>
+    <s:String x:Key="CJCORtitle">Conjac Jelly Charlieyan's Overlap Remover</s:String>
+    <s:String x:Key="AudioRender">Use audio render (higher audio quality, but lower speed)</s:String>
+    <s:String x:Key="NotesRemain" xml:space="preserve">Notes remaining:&#32;</s:String>
+    <s:String x:Key="OverlapRate" xml:space="preserve">Rate:&#32;</s:String>
+    <s:String x:Key="Prereading">Prereading track {trackcount}</s:String>
+    <s:String x:Key="SuccessfullyOutput" xml:space="preserve">Successfully outputted file to&#32;</s:String>
+</ResourceDictionary>

@@ -1,0 +1,15 @@
+﻿<Window x:Class="CJCOR.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:CJCOR"
+        mc:Ignorable="d"
+        Title="{DynamicResource CJCORtitle}" Height="200" Width="450" ResizeMode="CanMinimize" Icon="../Resources/CJCORicon.ico">
+    <Grid>
+        <CheckBox Content="{DynamicResource AudioRender}" x:Name="IsAud" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" DataContext="{DynamicResource SuccessfullyOutput}"/>
+        <TextBlock x:Name="NotesRem" Text="" HorizontalAlignment="Left" Margin="10,35,0,0" VerticalAlignment="Top" DataContext="{DynamicResource NotesRemain}"/>
+        <TextBlock x:Name="Rate" Text="" HorizontalAlignment="Left" Margin="10,60,0,0" VerticalAlignment="Top" DataContext="{DynamicResource OverlapRate}"/>
+        <Button x:Name="Progress" Content="{DynamicResource Start}" Margin="10,0,10,10" VerticalAlignment="Bottom" Height="25" Click="StartButtonPressed"/>
+    </Grid>
+</Window>
