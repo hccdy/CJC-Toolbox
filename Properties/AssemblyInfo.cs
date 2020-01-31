@@ -8,11 +8,11 @@ using System.Windows;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("CJC Toolbox")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("A toolbox containing all apps by CJC.")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("CJC Apps")]
 [assembly: AssemblyProduct("CJC Toolbox")]
-[assembly: AssemblyCopyright("Copyright ©  2020")]
+[assembly: AssemblyCopyright("Copyright © 2019-2020 CJC Apps")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
