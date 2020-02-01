@@ -814,7 +814,7 @@ namespace CJC_Advanced_Midi_Merger
                             }
                             for(int i = ls.Count - 1; i >= 0; i--)
                             {
-                                ous.WriteByte(ls[i]);
+                                ouf.Add(ls[i]);
                             }
                         }
                         int lstcmd = 256, nxtcmd = 256;
@@ -890,9 +890,9 @@ namespace CJC_Advanced_Midi_Merger
                                     hold[ch * 256 + nt]++;
                                     WriteTime(TM - lsttm);
                                     lsttm = TM;
-                                    ous.WriteByte((byte)cmd);
-                                    ous.WriteByte((byte)nt);
-                                    ous.WriteByte((byte)v);
+                                    ouf.Add((byte)cmd);
+                                    ouf.Add((byte)nt);
+                                    ouf.Add((byte)v);
                                     empt = false;
                                 }
                                 else
@@ -911,9 +911,9 @@ namespace CJC_Advanced_Midi_Merger
                                         hold[ch * 256 + nt]--;
                                         WriteTime(TM - lsttm);
                                         lsttm = TM;
-                                        ous.WriteByte((byte)cmd);
-                                        ous.WriteByte((byte)nt);
-                                        ous.WriteByte((byte)getbyte());
+                                        ouf.Add((byte)cmd);
+                                        ouf.Add((byte)nt);
+                                        ouf.Add((byte)getbyte());
                                         empt = false;
                                     }
                                     else
@@ -933,8 +933,8 @@ namespace CJC_Advanced_Midi_Merger
                                 {
                                     WriteTime(TM - lsttm);
                                     lsttm = TM;
-                                    ous.WriteByte((byte)cmd);
-                                    ous.WriteByte((byte)getbyte());
+                                    ouf.Add((byte)cmd);
+                                    ouf.Add((byte)getbyte());
                                 }
                                 else
                                 {
@@ -945,8 +945,8 @@ namespace CJC_Advanced_Midi_Merger
                             {
                                 WriteTime(TM - lsttm);
                                 lsttm = TM;
-                                ous.WriteByte((byte)cmd);
-                                ous.WriteByte((byte)getbyte());
+                                ouf.Add((byte)cmd);
+                                ouf.Add((byte)getbyte());
                                 empt = false;
                             }
                             else if (cm == 0b11100000)
@@ -955,9 +955,9 @@ namespace CJC_Advanced_Midi_Merger
                                 {
                                     WriteTime(TM - lsttm);
                                     lsttm = TM;
-                                    ous.WriteByte((byte)cmd);
-                                    ous.WriteByte((byte)getbyte());
-                                    ous.WriteByte((byte)getbyte());
+                                    ouf.Add((byte)cmd);
+                                    ouf.Add((byte)getbyte());
+                                    ouf.Add((byte)getbyte());
                                 }
                                 else
                                 {
@@ -968,22 +968,22 @@ namespace CJC_Advanced_Midi_Merger
                             {
                                 WriteTime(TM - lsttm);
                                 lsttm = TM;
-                                ous.WriteByte((byte)cmd);
-                                ous.WriteByte((byte)getbyte());
-                                ous.WriteByte((byte)getbyte());
+                                ouf.Add((byte)cmd);
+                                ouf.Add((byte)getbyte());
+                                ouf.Add((byte)getbyte());
                                 empt = false;
                             }
                             else if (cmd == 0b11110000)
                             {
                                 WriteTime(TM - lsttm);
                                 lsttm = TM;
-                                ous.WriteByte((byte)cmd);
+                                ouf.Add((byte)cmd);
                                 int ffx = getbyte();
-                                ous.WriteByte((byte)ffx);
+                                ouf.Add((byte)ffx);
                                 do
                                 {
                                     ffx = getbyte();
-                                    ous.WriteByte((byte)ffx);
+                                    ouf.Add((byte)ffx);
                                 } while (ffx != 0b11110111);
                                 empt = false;
                             }
@@ -991,7 +991,7 @@ namespace CJC_Advanced_Midi_Merger
                             {
                                 WriteTime(TM - lsttm);
                                 lsttm = TM;
-                                ous.WriteByte((byte)cmd);
+                                ouf.Add((byte)cmd);
                                 empt = false;
                             }
                             else if (cmd == 0b11111111)
@@ -1001,22 +1001,22 @@ namespace CJC_Advanced_Midi_Merger
                                 {
                                     WriteTime(TM - lsttm);
                                     lsttm = TM;
-                                    ous.WriteByte((byte)0b11111111);
-                                    ous.WriteByte((byte)cmd);
-                                    ous.WriteByte((byte)getbyte()); ous.WriteByte((byte)getbyte()); ous.WriteByte((byte)getbyte());
+                                    ouf.Add((byte)0b11111111);
+                                    ouf.Add((byte)cmd);
+                                    ouf.Add((byte)getbyte()); ouf.Add((byte)getbyte()); ouf.Add((byte)getbyte());
                                     empt = false;
                                 }
                                 else if(cmd >= 1 && cmd <= 10 || cmd == 0x7f)
                                 {
                                     WriteTime(TM - lsttm);
                                     lsttm = TM;
-                                    ous.WriteByte((byte)0b11111111);
-                                    ous.WriteByte((byte)cmd);
+                                    ouf.Add((byte)0b11111111);
+                                    ouf.Add((byte)cmd);
                                     long ff = readtime();
                                     WriteTime(ff);
                                     while(ff-- > 0)
                                     {
-                                        ous.WriteByte((byte)getbyte());
+                                        ouf.Add((byte)getbyte());
                                     }
                                     empt = false;
                                 }
@@ -1025,16 +1025,16 @@ namespace CJC_Advanced_Midi_Merger
                                     empt = false;
                                     WriteTime(TM - lsttm);
                                     lsttm = TM;
-                                    ous.WriteByte((byte)0b11111111);
-                                    ous.WriteByte((byte)cmd);
-                                    ous.WriteByte((byte)getbyte()); ous.WriteByte((byte)getbyte());
+                                    ouf.Add((byte)0b11111111);
+                                    ouf.Add((byte)cmd);
+                                    ouf.Add((byte)getbyte()); ouf.Add((byte)getbyte());
                                 }
                                 else if (cmd == 0x2f)
                                 {
                                     WriteTime(TM - lsttm);
                                     lsttm = TM;
-                                    ous.WriteByte((byte)0b11111111);
-                                    ous.WriteByte((byte)cmd);
+                                    ouf.Add((byte)0b11111111);
+                                    ouf.Add((byte)cmd);
                                     ouf.Add((byte)getbyte());
                                     break;
                                 }
@@ -1103,7 +1103,11 @@ namespace CJC_Advanced_Midi_Merger
                             ous.WriteByte((byte)(lens / 256 % 256));
                             ous.WriteByte((byte)(lens % 256));
                             trks++;
-                            ous.Write(ouf.ToArray(), 0, ouf.Count);
+                            //ous.Write(ouf.ToArray(), 0, ouf.Count);
+                            for(int i = 0; i < ouf.Count; i++)
+                            {
+                                ous.WriteByte(ouf[i]);
+                            }
                         }
                         Dispatcher.Invoke(new Action(() =>
                         {
@@ -1174,6 +1178,7 @@ namespace CJC_Advanced_Midi_Merger
                 Progress.Text = Progress.Text.Replace("{wrtt}", "0");
             }));
             WriteMidis(gr, false, false, false, 0, false, 0, gr.ppq, 0, false, false);
+            ous.Flush();
             ous.Seek(10, SeekOrigin.Begin);
             ous.WriteByte((byte)(trks / 256));
             ous.WriteByte((byte)(trks % 256));

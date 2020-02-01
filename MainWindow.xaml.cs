@@ -34,6 +34,10 @@ namespace CJC_Toolbox
         {
             Process.Start(System.Windows.Forms.Application.ExecutablePath, "CJCOR " + ((string)((ComboBoxItem)Language.SelectedItem).Uid));
         }
+        public void CJCMCG_Clicked(object sender,RoutedEventArgs e)
+        {
+            MessageBox.Show("This function has not been added yet. Please wait (^_^)");
+        }
         private void Language_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             List<ResourceDictionary> dictionaryList = new List<ResourceDictionary>();

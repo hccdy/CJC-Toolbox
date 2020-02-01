@@ -14,7 +14,7 @@
             <TextBlock Text="{DynamicResource CJCAMMInfo}" Margin="0,0,0,0" VerticalAlignment="Top" DockPanel.Dock="Top"/>
             <DockPanel VerticalAlignment="Top" Margin="0,1,0,0">
                     <TextBlock Text="{DynamicResource Version}" Margin="0,0,0,0" VerticalAlignment="Top"/>
-                    <TextBlock Text="1.5.0.0" HorizontalAlignment="Left"/>
+                    <TextBlock Text="1.6.0.0" HorizontalAlignment="Left"/>
             </DockPanel>
         </DockPanel>
         <Button HorizontalAlignment="Left" Margin="10,95,0,0" VerticalAlignment="Top" Width="75" Height="75" Click="CJCOR_Clicked">
@@ -25,6 +25,16 @@
             <DockPanel VerticalAlignment="Top" Margin="0,1,0,0">
                 <TextBlock Text="{DynamicResource Version}" Margin="0,0,0,0" VerticalAlignment="Top"/>
                 <TextBlock Text="2.3.0.0" HorizontalAlignment="Left"/>
+            </DockPanel>
+        </DockPanel>
+        <Button HorizontalAlignment="Left" Margin="10,180,0,0" VerticalAlignment="Top" Width="75" Height="75" Click="CJCMCG_Clicked">
+            <Image Source="Resources/CJCMCGicon.ico"/>
+        </Button>
+        <DockPanel Margin="95,180,0,0" VerticalAlignment="Top">
+            <TextBlock Text="{DynamicResource CJCMCGInfo}" Margin="0,0,0,0" VerticalAlignment="Top" DockPanel.Dock="Top"/>
+            <DockPanel VerticalAlignment="Top" Margin="0,1,0,0">
+                <TextBlock Text="{DynamicResource Version}" Margin="0,0,0,0" VerticalAlignment="Top"/>
+                <TextBlock Text="4.5.0.0" HorizontalAlignment="Left"/>
             </DockPanel>
         </DockPanel>
         <DockPanel Margin="0,0,10,10" VerticalAlignment="Bottom" HorizontalAlignment="Right">

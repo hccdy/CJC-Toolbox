@@ -50,4 +50,6 @@
     <s:String x:Key="OverlapRate" xml:space="preserve">比率:&#32;</s:String>
     <s:String x:Key="Prereading">预读取第{trackcount}个音轨</s:String>
     <s:String x:Key="SuccessfullyOutput" xml:space="preserve">成功将文件输出至</s:String>
+    <s:String x:Key="CJCMCGtitle">蒟蒻果冻charlieyan的MIDI计数君生成器</s:String>
+    <s:String x:Key="CJCMCGInfo" xml:space="preserve">蒟蒻果冻charlieyan的MIDI计数君生成器&#10;一个用来快速生成MIDI计数君的软件。&#10;由花抄抄大爷制作。</s:String>
 </ResourceDictionary>

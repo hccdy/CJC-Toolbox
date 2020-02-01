@@ -50,4 +50,6 @@
     <s:String x:Key="OverlapRate" xml:space="preserve">Rate:&#32;</s:String>
     <s:String x:Key="Prereading">Prereading track {trackcount}</s:String>
     <s:String x:Key="SuccessfullyOutput" xml:space="preserve">Successfully outputted file to&#32;</s:String>
+    <s:String x:Key="CJCMCGtitle">Conjac Jelly Charlieyan's Midi Counter Generator</s:String>
+    <s:String x:Key="CJCMCGInfo" xml:space="preserve">Conjac Jelly Charlieyan's Midi Counter Generator&#10;A software used to generate a counter of a MIDI.&#10;Made by HuaChaoChaoDaYe.</s:String>
 </ResourceDictionary>
