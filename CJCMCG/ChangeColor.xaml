@@ -1,0 +1,33 @@
+﻿<Window x:Class="CJCMCG.ChangeColor"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:mdfk="http://schemas.xceed.com/wpf/xaml/toolkit"
+        xmlns:local="clr-namespace:CJCMCG"
+        mc:Ignorable="d"
+        Title="{DynamicResource ColorChg}" Height="220" Width="360" ResizeMode="NoResize" Icon="../Resources/CJCMCGicon.ico">
+    <Grid>
+        <DockPanel Height="25" LastChildFill="False" Margin="10,10,0,0" VerticalAlignment="Top">
+            <Label Content="A" Height="25" Width="20" HorizontalAlignment="Left" VerticalAlignment="Top" DockPanel.Dock="Left"/>
+            <Slider HorizontalAlignment="Left" Minimum="0" Maximum="255" Margin="0,3,0,0" Width="220" VerticalAlignment="Top" x:Name="Aslider" Height="22" ValueChanged="Aslider_ValueChanged"/>
+            <mdfk:DecimalUpDown Width="60" Minimum="0" Maximum="255" Value="0" x:Name="Aval" Increment="1" Margin="10,0,0,0" ValueChanged="Aval_ValueChanged"/>
+        </DockPanel>
+        <DockPanel Height="25" LastChildFill="False" Margin="10,45,0,0" VerticalAlignment="Top">
+            <Label Content="R" Height="25" Width="20" HorizontalAlignment="Left" VerticalAlignment="Top" DockPanel.Dock="Left"/>
+            <Slider HorizontalAlignment="Left" Minimum="0" Maximum="255" Margin="0,3,0,0" Width="220" VerticalAlignment="Top" x:Name="Rslider" Height="22" ValueChanged="Rslider_ValueChanged"/>
+            <mdfk:DecimalUpDown Width="60" Minimum="0" Maximum="255" Value="0" x:Name="Rval" Increment="1" Margin="10,0,0,0" ValueChanged="Rval_ValueChanged"/>
+        </DockPanel>
+        <DockPanel Height="25" LastChildFill="False" Margin="10,80,0,0" VerticalAlignment="Top">
+            <Label Content="G" Height="25" Width="20" HorizontalAlignment="Left" VerticalAlignment="Top" DockPanel.Dock="Left"/>
+            <Slider HorizontalAlignment="Left" Minimum="0" Maximum="255" Margin="0,3,0,0" Width="220" VerticalAlignment="Top" x:Name="Gslider" Height="22" ValueChanged="Gslider_ValueChanged"/>
+            <mdfk:DecimalUpDown Width="60" Minimum="0" Maximum="255" Value="0" x:Name="Gval" Increment="1" Margin="10,0,0,0" ValueChanged="Gval_ValueChanged"/>
+        </DockPanel>
+        <DockPanel Height="25" LastChildFill="False" Margin="10,115,0,0" VerticalAlignment="Top">
+            <Label Content="B" Height="25" Width="20" HorizontalAlignment="Left" VerticalAlignment="Top" DockPanel.Dock="Left"/>
+            <Slider HorizontalAlignment="Left" Minimum="0" Maximum="255" Margin="0,3,0,0" Width="220" VerticalAlignment="Top" x:Name="Bslider" Height="22" ValueChanged="Bslider_ValueChanged"/>
+            <mdfk:DecimalUpDown Width="60" Minimum="0" Maximum="255" Value="0" x:Name="Bval" Increment="1" Margin="10,0,0,0" ValueChanged="Bval_ValueChanged"/>
+        </DockPanel>
+        <Button x:Name="okkey" Content="{DynamicResource OKkey}" Margin="10,10,10,10" VerticalAlignment="Bottom" Height="25" Click="okkey_Click"/>
+    </Grid>
+</Window>

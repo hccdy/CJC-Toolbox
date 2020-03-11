@@ -12,23 +12,16 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
-namespace CJC_Advanced_Midi_Merger
+namespace CJCMCG
 {
     /// <summary>
-    /// SaveWindow.xaml 的交互逻辑
+    /// Helpfile.xaml 的交互逻辑
     /// </summary>
-    public partial class StartWindow : Window
+    public partial class Helpfile : Window
     {
-        public bool ss;
-        public StartWindow()
+        public Helpfile()
         {
             InitializeComponent();
-            ss = false;
-        }
-        public void okclick(object sender, RoutedEventArgs e)
-        {
-            ss = true;
-            Close();
         }
     }
 }

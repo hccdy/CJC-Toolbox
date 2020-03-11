@@ -52,4 +52,51 @@
     <s:String x:Key="SuccessfullyOutput" xml:space="preserve">Successfully outputted file to&#32;</s:String>
     <s:String x:Key="CJCMCGtitle">Conjac Jelly Charlieyan's Midi Counter Generator</s:String>
     <s:String x:Key="CJCMCGInfo" xml:space="preserve">Conjac Jelly Charlieyan's Midi Counter Generator&#10;A software used to generate a counter of a MIDI.&#10;Made by HuaChaoChaoDaYe.</s:String>
+    <s:String x:Key="SelectFile">Select File</s:String>
+    <s:String x:Key="Width">Width</s:String>
+    <s:String x:Key="Height">Height</s:String>
+    <s:String x:Key="Fps">FPS</s:String>
+    <s:String x:Key="Preset">Preset</s:String>
+    <s:String x:Key="Preview">Preview Text</s:String>
+    <s:String x:Key="PatSel">Pattern</s:String>
+    <s:String x:Key="FonSel">Font</s:String>
+    <s:String x:Key="FonSz">Font Size</s:String>
+    <s:String x:Key="Color">Color</s:String>
+    <s:String x:Key="PatSv">Edit Patterns</s:String>
+    <s:String x:Key="ColorChg">Change Color</s:String>
+    <s:String x:Key="ReadHelp">Instructions to use</s:String>
+    <s:String x:Key="Savv">Save</s:String>
+    <s:String x:Key="ReadFinished">Reading finished. {notecnt} notes.</s:String>
+    <s:String x:Key="FrameRender">Rendered {frames} frames</s:String>
+    <s:String x:Key="DelayStart">Delay Start (sec):</s:String>
+    <s:String x:Key="cjcmcg_help" xml:space="preserve">This software is made by CJC Apps. Please make sure that there is a ffmpeg.exe in the same folder as the program or in C:\Windows\System32. If you don't have it, please download at http://ffmpeg.org . It is also recommended to download an xz.exe in order to avoid exceptions while decompressing MIDI.
+You can make patterns with variables below. It will automatically replace them with values:
+  {0}: Note Count
+  {0,}: Note Count with a comma per 3 digits
+  {1}: All notes
+  {1,}: All notes with a comma per 3 digits
+  {1-0}: Remaining notes
+  {1-0,}: Remaining notes with a comma per 3 digits
+  {2}: BPM
+  {3}: Time (secs)
+  {4}: NPS
+  {4,}: NPS with a comma per 3 digits
+  {5}: Polyphony
+  {5,}: Polyphony with a comma per 3 digits
+  {6}: Tick
+  {6,}: Tick with a comma per 3 digits
+  {7}: All tick
+  {7,}: All tick with a comma per 3 digits
+  {7-6}: Remaining ticks
+  {7-6,}: Remaining ticks with a comma per 3 digits
+  {8}: Beats
+  {9}: All beats
+  {9-8}: Remaining beats
+  {A}: Resolution (PPQ)
+  {A,}: Resolution (PPQ) with a comma per 3 digits
+  {B}: Lyrics
+
+If you use this counter in your video, don't forget to credit us like this:
+Midi Counter rendered with CJCMCG by CJC Apps.
+CJC Apps website: http://kin.moe/</s:String>
 </ResourceDictionary>

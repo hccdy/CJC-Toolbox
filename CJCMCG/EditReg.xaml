@@ -1,0 +1,14 @@
+﻿<Window x:Class="CJCMCG.EditReg"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:CJCMCG"
+        mc:Ignorable="d"
+        Title="{DynamicResource PatSv}" Height="300" Width="200" ResizeMode="NoResize" Loaded="Window_Loaded" Icon="../Resources/CJCMCGicon.ico">
+    <Grid>
+        <ListBox Margin="10,10,10,45" x:Name="ls"/>
+        <Button Content="{DynamicResource Remove}" Margin="10,0,105,10" VerticalAlignment="Bottom" Height="25" Click="RemoveClicked"/>
+        <Button Content="{DynamicResource Savv}" Margin="105,0,10,10" VerticalAlignment="Bottom" Height="25" Click="SaveClicked"/>
+    </Grid>
+</Window>

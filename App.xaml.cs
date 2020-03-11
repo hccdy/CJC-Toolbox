@@ -51,6 +51,12 @@ namespace CJC_Toolbox
                     LanguageChange(Lang);
                     window.Show();
                 }
+                else if (e.Args[0] == "CJCMCG")
+                {
+                    CJCMCG.MainWindow window = new CJCMCG.MainWindow();
+                    LanguageChange(Lang);
+                    window.Show();
+                }
             }
         }
     }

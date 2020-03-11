@@ -12,22 +12,23 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
-namespace CJC_Advanced_Midi_Merger
+namespace CJCMCG
 {
     /// <summary>
-    /// SaveWindow.xaml 的交互逻辑
+    /// StringInputer.xaml 的交互逻辑
     /// </summary>
-    public partial class StartWindow : Window
+    public partial class StringInputer : Window
     {
-        public bool ss;
-        public StartWindow()
+        public bool tuichu_zhengchangly;
+        public StringInputer()
         {
+            tuichu_zhengchangly = false;
             InitializeComponent();
-            ss = false;
         }
-        public void okclick(object sender, RoutedEventArgs e)
+
+        private void Button_Click(object sender, RoutedEventArgs e)
         {
-            ss = true;
+            tuichu_zhengchangly = true;
             Close();
         }
     }

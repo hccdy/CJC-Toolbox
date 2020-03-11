@@ -36,7 +36,7 @@ namespace CJC_Toolbox
         }
         public void CJCMCG_Clicked(object sender,RoutedEventArgs e)
         {
-            MessageBox.Show("This function has not been added yet. Please wait (^_^)");
+            Process.Start(System.Windows.Forms.Application.ExecutablePath, "CJCMCG " + ((string)((ComboBoxItem)Language.SelectedItem).Uid));
         }
         private void Language_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {

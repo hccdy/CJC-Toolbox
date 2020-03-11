@@ -250,6 +250,7 @@ namespace CJCOR
             }
             else
             {
+                Stream st = File.Open(filein, FileMode.Open, FileAccess.Read, FileShare.Read);
                 for (int trk = 0; trk < trkcnt; trk++)
                 {
                     trkpos[trkcnt - trk - 1] = inp.Position;
@@ -258,11 +259,11 @@ namespace CJCOR
                         Progress.SetResourceReference(ContentControl.ContentProperty, "Prereading");
                         Progress.Content = ((string)(Progress.Content)).Replace("{trackcount}", (trk + 1).ToString() + "/" + trkcnt.ToString());
                     }));
-                    ReadByte(); ReadByte(); ReadByte(); ReadByte();
-                    long len = ReadByte();
-                    len = len * 256 + ReadByte();
-                    len = len * 256 + ReadByte();
-                    len = len * 256 + ReadByte();
+                    st.ReadByte(); st.ReadByte(); st.ReadByte(); st.ReadByte();
+                    long len = st.ReadByte();
+                    len = len * 256 + st.ReadByte();
+                    len = len * 256 + st.ReadByte();
+                    len = len * 256 + st.ReadByte();
                     inp.Seek(len, SeekOrigin.Current);
                 }
             }

@@ -52,4 +52,51 @@
     <s:String x:Key="SuccessfullyOutput" xml:space="preserve">成功将文件输出至</s:String>
     <s:String x:Key="CJCMCGtitle">蒟蒻果冻charlieyan的MIDI计数君生成器</s:String>
     <s:String x:Key="CJCMCGInfo" xml:space="preserve">蒟蒻果冻charlieyan的MIDI计数君生成器&#10;一个用来快速生成MIDI计数君的软件。&#10;由花抄抄大爷制作。</s:String>
+    <s:String x:Key="SelectFile">选择文件</s:String>
+    <s:String x:Key="Width">宽度</s:String>
+    <s:String x:Key="Height">高度</s:String>
+    <s:String x:Key="Fps">每秒帧数</s:String>
+    <s:String x:Key="Preset">预设</s:String>
+    <s:String x:Key="Preview">文字预览</s:String>
+    <s:String x:Key="PatSel">选择模板</s:String>
+    <s:String x:Key="FonSel">字体</s:String>
+    <s:String x:Key="FonSz">字号</s:String>
+    <s:String x:Key="Color">颜色</s:String>
+    <s:String x:Key="PatSv">编辑模板</s:String>
+    <s:String x:Key="ColorChg">更改颜色</s:String>
+    <s:String x:Key="ReadHelp">使用说明</s:String>
+    <s:String x:Key="Savv">保存</s:String>
+    <s:String x:Key="ReadFinished">读取完毕。音符数: {notecnt}</s:String>
+    <s:String x:Key="FrameRender">已转换{frames}帧</s:String>
+    <s:String x:Key="DelayStart">起始时间延迟 (秒):</s:String>
+    <s:String x:Key="cjcmcg_help" xml:space="preserve">软件由CJC Apps制作。请确认程序所在的文件夹中或C:\Windows\System32中有ffmpeg.exe。如果没有，你可以在http://ffmpeg.org下载。同时也推荐下载xz.exe，以免在MIDI解压缩过程中出现异常。
+你可以按照下方说明制作带有变量的模板，程序会自动将特定字符串替换成特定的值：
+  {0}: 当前音符数
+  {0,}: 当前音符数，带千位分隔符
+  {1}: 所有音符数
+  {1,}: 所有音符数，带千位分隔符
+  {1-0}: 剩余音符数
+  {1-0,}: 剩余音符数，带千位分隔符
+  {2}: 每分钟拍数（即BPM）
+  {3}: 时间（秒）
+  {4}: 每秒音符数
+  {4,}: 每秒音符数，带千位分隔符
+  {5}: 同时按下的音符数
+  {5,}: 同时按下的音符数，带千位分隔符
+  {6}: 帧数
+  {6,}: 帧数，带千位分隔符
+  {7}: 总帧数
+  {7,}: 总帧数，带千位分隔符
+  {7-6}: 剩余帧数
+  {7-6,}: 剩余帧数，带千位分隔符
+  {8}: 拍数
+  {9}: 总拍数
+  {9-8}: 剩余拍数
+  {A}: 每拍帧数（即PPQ）
+  {A,}: 每拍帧数，带千位分隔符
+  {B}: 歌词
+
+如果你的视频中用了此计数君，不要忘记在视频简介中写入这段内容：
+计数君由CJC Apps编写的CJCMCG制作。
+CJC Apps官网：http://kin.moe/</s:String>
 </ResourceDictionary>
