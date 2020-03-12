@@ -49,12 +49,15 @@ namespace CJC_Advanced_Midi_Merger
         {
             var open = new OpenFileDialog();
             open.Filter = "Midi files and groups (*.mid, *.midi, *.cjcamm)|*.mid; *.midi; *.cjcamm";
+            open.Multiselect = true;
             if ((bool)open.ShowDialog())
             {
-                ListBoxItem itm = new ListBoxItem();
-                itm.Content = open.FileName;
-                itm.DataContext = new Sts();
-                MidisAdded.Items.Add(itm);
+                foreach (string i in open.FileNames) {
+                    ListBoxItem itm = new ListBoxItem();
+                    itm.Content = i;
+                    itm.DataContext = new Sts();
+                    MidisAdded.Items.Add(itm);
+                }
             }
             else return;
         }
