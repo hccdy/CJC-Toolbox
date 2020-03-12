@@ -230,6 +230,19 @@ namespace CJCMCG
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            try {
+                Process ffmpeg = new Process();
+                ffmpeg.StartInfo = new ProcessStartInfo("ffmpeg", "-help");
+                ffmpeg.StartInfo.RedirectStandardInput = false;
+                ffmpeg.StartInfo.CreateNoWindow = true;
+                ffmpeg.StartInfo.UseShellExecute = false;
+                ffmpeg.StartInfo.RedirectStandardError = false;
+                ffmpeg.Start();
+            } catch (Exception)
+            {
+                MessageBox.Show("There was an error finding ffmpeg.\nIs ffmpeg.exe in the same folder as this program?");
+                Close();
+            }
             System.Drawing.Text.InstalledFontCollection fonts = new System.Drawing.Text.InstalledFontCollection();
             foreach (System.Drawing.FontFamily family in fonts.Families)
             {
@@ -318,14 +331,7 @@ namespace CJCMCG
             ffmpeg.StartInfo.CreateNoWindow = true;
             ffmpeg.StartInfo.UseShellExecute = false;
             ffmpeg.StartInfo.RedirectStandardError = false;
-            try
-            {
-                ffmpeg.Start();
-            }
-            catch (Exception)
-            {
-                MessageBox.Show("There was an error starting the ffmpeg process\nIs ffmpeg.exe in the same folder as this program?");
-            }
+            ffmpeg.Start();
             return ffmpeg;
         }
         Process ff;
@@ -597,6 +603,7 @@ namespace CJCMCG
             long noteall = 0;
             int nowtrk = 1;
             int alltic = 0;
+            int allticreal = 0;
             ArrayList nts = new ArrayList(), nto = new ArrayList();
             ArrayList lrcs = new ArrayList();
             lrcs.Add(new pairls(0, "", -1, -1));
@@ -731,6 +738,10 @@ namespace CJCMCG
                         {
                             ReadByte();
                             leng--;
+                            if (TM > allticreal)
+                            {
+                                allticreal = TM;
+                            }
                             TM -= added;
                             break;
                         }
@@ -875,7 +886,7 @@ namespace CJCMCG
             }
             for (int i = 0; i < 5 * F; i++)
             {
-                string s = getstring(noteall, noteall, 600000000000.0 / resol / ((pairli)bpm[bpmptr]).y, 1.0 * (tmdf - F * desv) / F, notecnt - history[tmdf % F], 0, alltic, tmdf);
+                string s = getstring(noteall, noteall, 600000000000.0 / resol / ((pairli)bpm[bpmptr]).y, 1.0 * (tmdf - F * desv) / F, notecnt - history[tmdf % F], 0, alltic, alltic);
                 newframe(W, H, s);
                 Dispatcher.Invoke(new Action(() =>
                 {
