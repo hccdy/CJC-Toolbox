@@ -536,6 +536,17 @@ namespace CJCMCG
                 }));
                 return;
             }
+            string fileout = "";
+            SaveFileDialog getFileout = new SaveFileDialog();
+            getFileout.Filter = "MOV files (*.mov)|*.mov";
+            if ((bool)getFileout.ShowDialog())
+            {
+                fileout = getFileout.FileName;
+            }
+            else
+            {
+                return;
+            }
             Dispatcher.Invoke(new Action(() =>
             {
                 patt = pat.Text;
@@ -827,7 +838,7 @@ namespace CJCMCG
             {
                 tmc[i] = tmc[i - 1] + (((pairli)bpm[i]).x - ((pairli)bpm[i - 1]).x) * ((pairli)bpm[i - 1]).y / 10000.0;
             }
-            ff = startNewSSFF(W, H, F, filein + ".counter.mov");
+            ff = startNewSSFF(W, H, F, fileout);
             int tmdf = 0;
             for (int i = 0; i < F * desv; i++)
             {
