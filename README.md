@@ -54,3 +54,22 @@ Generate a counter for a midi.
 + At least 2GHz Multi-Core CPU
 + At least Windows 7 SP1
 + FFmpeg and FFplay installed
+
+## About credit
+
+If you use this program and upload videos to YouTube, please credit us like below:
+
+### For CJCAMM
+
+Midis merged with CJCAMM by CJC Apps.
+CJC Apps website: http://kin.moe/
+
+### For CJCOR
+
+Overlap in the midi removed with CJCOR by CJC Apps.
+CJC Apps website: http://kin.moe/
+
+### For CJCMCG
+
+Midi Counter rendered with CJCMCG by CJC Apps.
+CJC Apps website: http://kin.moe/
