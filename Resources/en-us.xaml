@@ -70,6 +70,7 @@
     <s:String x:Key="FrameRender">Rendered {frames} frames</s:String>
     <s:String x:Key="DelayStart">Delay Start (sec):</s:String>
     <s:String x:Key="cjcmcg_help" xml:space="preserve">This software is made by CJC Apps. Please make sure that there is a ffmpeg.exe in the same folder as the program or in C:\Windows\System32. If you don't have it, please download at http://ffmpeg.org . It is also recommended to download an xz.exe in order to avoid exceptions while decompressing MIDI.
+
 You can make patterns with variables below. It will automatically replace them with values:
   {0}: Note Count
   {0,}: Note Count with a comma per 3 digits

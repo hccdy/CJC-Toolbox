@@ -70,6 +70,7 @@
     <s:String x:Key="FrameRender">已转换{frames}帧</s:String>
     <s:String x:Key="DelayStart">起始时间延迟 (秒):</s:String>
     <s:String x:Key="cjcmcg_help" xml:space="preserve">软件由CJC Apps制作。请确认程序所在的文件夹中或C:\Windows\System32中有ffmpeg.exe。如果没有，你可以在http://ffmpeg.org下载。同时也推荐下载xz.exe，以免在MIDI解压缩过程中出现异常。
+
 你可以按照下方说明制作带有变量的模板，程序会自动将特定字符串替换成特定的值：
   {0}: 当前音符数
   {0,}: 当前音符数，带千位分隔符
