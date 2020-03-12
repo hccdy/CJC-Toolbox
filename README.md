@@ -62,14 +62,17 @@ If you use this program and upload videos to YouTube, please credit us like belo
 ### For CJCAMM
 
 Midis merged with CJCAMM by CJC Apps.
+
 CJC Apps website: http://kin.moe/
 
 ### For CJCOR
 
 Overlap in the midi removed with CJCOR by CJC Apps.
+
 CJC Apps website: http://kin.moe/
 
 ### For CJCMCG
 
 Midi Counter rendered with CJCMCG by CJC Apps.
+
 CJC Apps website: http://kin.moe/
