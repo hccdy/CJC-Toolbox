@@ -1,5 +1,5 @@
 # CJC Toolbox
- 
+
 ## About CJC Toolbox
 
 CJC Toolbox is a software that contains all CJC Apps. You don't need to download all the apps one by one. Instead, you only need to download the toolbox to have all the softwares by CJC.
@@ -54,6 +54,7 @@ Generate a counter for a midi.
 + At least 2GHz Multi-Core CPU
 + At least Windows 7 SP1
 + FFmpeg and FFplay installed
++ Xz installed (to decompress a file faster and better in CJCMCG)
 
 ## About credit
 
