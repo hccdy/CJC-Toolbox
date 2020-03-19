@@ -322,10 +322,9 @@ namespace CJCMCG
         {
             Process ffmpeg = new Process();
             string args = "" +
-                    " -s " + W.ToString() + "x" + H.ToString() + " -y -vsync 2 -threads " + Environment.ProcessorCount.ToString() + " -i - -r " + Convert.ToString(F)
-                    + " -vcodec png";
+                    " -s " + W.ToString() + "x" + H.ToString() + " -y -vsync 2 -threads " + Environment.ProcessorCount.ToString() + " -r " + Convert.ToString(F)
+                    + " -i - -vcodec png";
             args += " \"" + path + "\"";
-            Console.WriteLine(args);
             ffmpeg.StartInfo = new ProcessStartInfo("ffmpeg", args);
             ffmpeg.StartInfo.RedirectStandardInput = true;
             ffmpeg.StartInfo.CreateNoWindow = true;
