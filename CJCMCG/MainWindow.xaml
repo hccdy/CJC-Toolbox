@@ -45,7 +45,7 @@
                 </DockPanel>
                 <DockPanel Height="25" LastChildFill="False" Margin="10,0,0,0" VerticalAlignment="Top">
                     <Label Content="{DynamicResource FonSel}" HorizontalAlignment="Left" VerticalAlignment="Top" DockPanel.Dock="Left"/>
-                    <ComboBox HorizontalAlignment="Left" Width="60" Height="25" VerticalAlignment="Top" DockPanel.Dock="Left" x:Name="font">
+                    <ComboBox HorizontalAlignment="Left" SelectionChanged="fonts_SelectionChanged" Width="60" Height="25" VerticalAlignment="Top" DockPanel.Dock="Left" x:Name="font">
                     </ComboBox>
                 </DockPanel>
                 <DockPanel Height="25" LastChildFill="False" Margin="10,0,0,0" VerticalAlignment="Top">
@@ -55,18 +55,18 @@
                 </DockPanel>
                 <DockPanel Height="25" LastChildFill="False" Margin="10,0,0,0" VerticalAlignment="Top">
                     <Label Content="{DynamicResource Color}" HorizontalAlignment="Left" VerticalAlignment="Top" DockPanel.Dock="Left"/>
-                    <Button HorizontalAlignment="Left" Width="25" Height="25" Background="White" x:Name="color" Click="color_Click">
+                    <Button HorizontalAlignment="Left" Uid="{DynamicResource UpdateOld}" Width="25" Height="25" Background="White" x:Name="color" Click="color_Click">
                     </Button>
                 </DockPanel>
                 <Button Content="{DynamicResource PatSv}" Height="25" Margin="10,0,0,0" VerticalAlignment="Top" Click="Ere_Click"/>
             </DockPanel>
-            <TextBox Margin="0,10,0,0" x:Name="pat" Text="Notes: {0,}/{1,}" AcceptsReturn="True"/>
+            <TextBox Margin="0,10,0,0" x:Name="pat" Uid="{DynamicResource DetectedOld}" FontFamily="Consolas" Text="Notes: {format(nc,',')}/{format(an,',')}" AcceptsReturn="True"/>
         </DockPanel>
         <DockPanel HorizontalAlignment="Right" Width="200" Margin="0,80,10,80">
             <DockPanel VerticalAlignment="Top" Height="25" DockPanel.Dock="Top">
                 <Label Height="25" Content="{DynamicResource Preview}" VerticalAlignment="Top" Margin="0,0,0,0"/>
             </DockPanel>
-            <TextBox IsReadOnly="True" x:Name="preview" Margin="0,0,0,0"/>
+            <TextBox IsReadOnly="True" Uid="{DynamicResource ConvertFin}" FontFamily="Consolas" x:Name="preview" Margin="0,0,0,0"/>
         </DockPanel>
         <DockPanel Height="25" LastChildFill="False" Margin="0,0,10,45" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="200">
             <Label Content="{DynamicResource DelayStart}" HorizontalAlignment="Left" VerticalAlignment="Top" DockPanel.Dock="Left"/>

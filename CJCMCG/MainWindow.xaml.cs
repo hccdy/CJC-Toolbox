@@ -195,13 +195,16 @@ namespace CJCMCG
         public void filename_Click(object sender, RoutedEventArgs e)
         {
             var open = new OpenFileDialog();
-            open.Filter = "Midi files or zipped files (*.mid, *.midi, *.xz, *.7z, *.zip, *.gz, *.tar, *.rar)|*.mid; *.midi; *.xz; *.7z; *.zip; *.gz; *.tar; *.rar";
+            open.Filter = "Midi files or zipped files (*.mid, *.cjcmcg, *.xz, *.7z, *.zip, *.gz, *.tar, *.rar)|*.mid; *.cjcmcg; *.xz; *.7z; *.zip; *.gz; *.tar; *.rar";
             if ((bool)open.ShowDialog())
             {
                 filename.Content = open.FileName;
                 fileselected = true;
             }
         }
+
+        public static string[] oldList = { "{0}", "{0,}", "{1}", "{1,}", "{1-0}", "{1-0,}", "{2}", "{3}", "{4}", "{4,}", "{5}", "{5,}", "{6}", "{6,}", "{7}", "{7,}", "{7-6}", "{7-6,}", "{8}", "{9}", "{9-8}", "{A,}", "{A}", "{B}" };
+        public static string[] newList = { "{nc}", "{format(nc,',')}", "{an}", "{format(an,',')}", "{an-nc}", "{format(an-nc,',')}", "{bpm}", "{format(tm,".2f")}", "{nps}", "{format(nps,',')}", "{pol}", "{format(pol,',')}", "{tic}", "{format(tic,',')}", "{ati}", "{format(ati,',')}", "{ati-tic}", "{format(ati-tic,',')}", "{bts}", "{abt}", "{abt-bts}", "{format(ppq,',')}", "{ppq}", "{lrc}" };
 
         private void pats_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
@@ -223,16 +226,57 @@ namespace CJCMCG
             string pattt = (string)reg.GetValue("Pattern");
             pattt = pattt.Replace("\\10", "\n").Replace("\\23", "\\");
             pat.Text = pattt;
-            long coll = (int)(reg.GetValue("Color"));
+            long coll = (int)reg.GetValue("Color");
             UInt32 col = Convert.ToUInt32(coll < 0 ? coll + (1L << 32) : coll);
             color.Background = new SolidColorBrush(System.Windows.Media.Color.FromArgb((byte)(col / 256 / 256 / 256), (byte)(col / 256 / 256 % 256), (byte)(col / 256 % 256), (byte)(col % 256)));
+            bool isnew = false;
+            for(int i = 0; i < oldList.Length - 2; i++)
+            {
+                if (pattt.IndexOf(oldList[i]) > -1)
+                {
+                    isnew = true;
+                }
+            }
+            if (isnew)
+            {
+                if (MessageBox.Show(pat.Uid, color.Uid, MessageBoxButton.YesNo).ToString() == "Yes")
+                {
+                    for(int i = 0; i < oldList.Length; i++)
+                    {
+                        pattt = pattt.Replace(oldList[i], newList[i]);
+                    }
+                    pat.Text = pattt;
+                    if (MessageBox.Show(preview.Uid, color.Uid, MessageBoxButton.YesNo).ToString() == "Yes")
+                    {
+                        RegistryKey key = Registry.CurrentUser.OpenSubKey(@"Software\CJCMCG", true);
+                        if (key.GetSubKeyNames().Contains(((ComboBoxItem)pats.SelectedItem).Uid))
+                        {
+                            key.DeleteSubKeyTree(((ComboBoxItem)pats.SelectedItem).Uid);
+                        }
+                        key.CreateSubKey(((ComboBoxItem)pats.SelectedItem).Uid);
+                        key = key.OpenSubKey(((ComboBoxItem)pats.SelectedItem).Uid, true);
+                        key.SetValue("FontFace", ((ComboBoxItem)font.SelectedItem).Uid, RegistryValueKind.String);
+                        key.SetValue("FontSize", (int)fsize.Value, RegistryValueKind.DWord);
+                        System.Windows.Media.Color colr = ((SolidColorBrush)color.Background).Color;
+                        long cc = Convert.ToUInt32(colr.A * 256L * 256 * 256 + colr.R * 256 * 256 + colr.G * 256 + colr.B);
+                        key.SetValue("Color", Convert.ToInt32(cc >= (1L << 31) ? cc - (1L << 32) : cc), RegistryValueKind.DWord);
+                        key.SetValue("Pattern", pattt.Replace("\\", "\\23").Replace("\n", "\\10"), RegistryValueKind.String);
+                    }
+                }
+            }
+        }
+
+        private void fonts_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+        	pat.FontFamily = new System.Windows.Media.FontFamily(((ComboBoxItem)(font.SelectedItem)).Uid);
+        	preview.FontFamily = new System.Windows.Media.FontFamily(((ComboBoxItem)(font.SelectedItem)).Uid);
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             try {
                 Process ffmpeg = new Process();
-                ffmpeg.StartInfo = new ProcessStartInfo("ffmpeg", "-help");
+                ffmpeg.StartInfo = new ProcessStartInfo("ffmpeg", "-h");
                 ffmpeg.StartInfo.RedirectStandardInput = false;
                 ffmpeg.StartInfo.CreateNoWindow = true;
                 ffmpeg.StartInfo.UseShellExecute = false;
@@ -250,7 +294,7 @@ namespace CJCMCG
                 cbb.Content = family.Name;
                 cbb.Uid = family.Name;
                 font.Items.Add(cbb);
-                if (family.Name == "Arial")
+                if (family.Name == "Consolas")
                 {
                     font.SelectedItem = cbb;
                 }
@@ -322,7 +366,7 @@ namespace CJCMCG
         {
             Process ffmpeg = new Process();
             string args = "" +
-                    " -s " + W.ToString() + "x" + H.ToString() + " -y -vsync 2 -threads " + Environment.ProcessorCount.ToString() + " -r " + Convert.ToString(F)
+                    /*" -s " + W.ToString() + "x" + H.ToString() + */" -y -vsync 2 -threads " + Environment.ProcessorCount.ToString() + " -r " + Convert.ToString(F)
                     + " -i - -vcodec png";
             args += " \"" + path + "\"";
             ffmpeg.StartInfo = new ProcessStartInfo("ffmpeg", args);
@@ -336,7 +380,7 @@ namespace CJCMCG
         Process ff;
         static bool CanDec(string s)
         {
-            return s.EndsWith(".mid") || s.EndsWith(".xz") || s.EndsWith(".zip") || s.EndsWith(".7z") || s.EndsWith(".rar") || s.EndsWith(".tar") || s.EndsWith(".gz");
+            return s.EndsWith(".mid") || s.EndsWith(".xz") || s.EndsWith(".zip") || s.EndsWith(".7z") || s.EndsWith(".rar") || s.EndsWith(".tar") || s.EndsWith(".gz") || s.EndsWith(".cjcmcg");
         }
         static Stream AddXZLayer(Stream input)
         {
@@ -347,7 +391,8 @@ namespace CJCMCG
                 {
                     RedirectStandardOutput = true,
                     RedirectStandardInput = true,
-                    UseShellExecute = false
+                    UseShellExecute = false,
+                	CreateNoWindow = true
                 };
                 xz.Start();
                 Task.Run(() =>
@@ -428,6 +473,28 @@ namespace CJCMCG
             }
             throw new Exception("No compatible file found in the .gz");
         }
+        static Process Natsulang()
+        {
+            try
+            {
+                Process ntl = new Process();
+                ntl.StartInfo = new ProcessStartInfo("python", "natsulang.pyo -s")
+                {
+                    RedirectStandardOutput = true,
+                    RedirectStandardInput = true,
+                    RedirectStandardError = true,
+                    UseShellExecute = false,
+                    CreateNoWindow = true
+                };
+                ntl.Start();
+                return ntl;
+            }
+            catch (Exception)
+            {
+                MessageBox.Show("python not found, please install python version >=3.0.0 and add it to PATH.");
+                return null;
+            }
+        }
         int toint(int x)
         {
             return x < 0 ? x + 256 : x;
@@ -439,7 +506,7 @@ namespace CJCMCG
         {
             using (var fon = new Font(fonsel, fonsz))
             {
-                var img = new Bitmap(W, H, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+                var img = new Bitmap(W, H);
                 using (var gfx = Graphics.FromImage(img))
                 {
                     gfx.FillRectangle(System.Drawing.Brushes.Transparent, 0, 0, W, H);
@@ -451,39 +518,31 @@ namespace CJCMCG
                     }));
                     gfx.Flush();
                 }
+                img.Clone(new System.Drawing.Rectangle(0, 0, W, H), System.Drawing.Imaging.PixelFormat.DontCare);
                 byte[] shit = (byte[])(new ImageConverter()).ConvertTo(img, typeof(byte[]));
                 ff.StandardInput.BaseStream.Write(shit, 0, shit.Length);
+                img.Dispose();
             }
         }
         int resol;
         string patt;
-        public string getstring(long nc, long an, double bp, double tm, long np, long po, long ti, long at, String lrcs = "")
+        public string getstring(long nc, long an, double bp, double tm, long np, long po, long ti, long at, long frm, String lrcs = "", long lrc_frm = 0)
         {
-            string ss = patt;
+            string ss = "{nc={0};an={1};bpm={2};tm={3};nps={4};pol={5};tic={6};ati={7};bts={8};abt={9};ppq={A};lrc=\"\"\"{B}\"\"\";frm={C};lrc_frm={D};}";
             ss = ss.Replace("{0}", Convert.ToString(nc));
-            ss = ss.Replace("{0,}", (nc).ToString("N0"));
             ss = ss.Replace("{1}", Convert.ToString(an));
-            ss = ss.Replace("{1,}", (an).ToString("N0"));
-            ss = ss.Replace("{1-0}", Convert.ToString(an - nc));
-            ss = ss.Replace("{1-0,}", (an - nc).ToString("N0"));
             ss = ss.Replace("{2}", Convert.ToString(Math.Round(bp * 10) / 10));
             ss = ss.Replace("{3}", Convert.ToInt32(tm * 100) / 100 + "." + (Convert.ToInt32(tm * 100) % 100 / 10) + (Convert.ToInt32(tm * 100) % 10));
             ss = ss.Replace("{4}", Convert.ToString(np));
-            ss = ss.Replace("{4,}", (np).ToString("N0"));
             ss = ss.Replace("{5}", Convert.ToString(po));
-            ss = ss.Replace("{5,}", (po).ToString("N0"));
             ss = ss.Replace("{6}", Convert.ToString(ti));
-            ss = ss.Replace("{6,}", (ti).ToString("N0"));
             ss = ss.Replace("{7}", Convert.ToString(at));
-            ss = ss.Replace("{7,}", (at).ToString("N0"));
-            ss = ss.Replace("{7-6}", Convert.ToString(at - ti));
-            ss = ss.Replace("{7-6,}", (at - ti).ToString("N0"));
             ss = ss.Replace("{8}", Convert.ToString(ti / resol + 1));
             ss = ss.Replace("{9}", Convert.ToString(at / resol + 1));
-            ss = ss.Replace("{9-8}", Convert.ToString(at / resol - ti / resol));
             ss = ss.Replace("{A}", Convert.ToString(resol));
-            ss = ss.Replace("{A,}", resol.ToString("N0"));
-            ss = ss.Replace("{B}", lrcs);
+            ss = ss.Replace("{B}", lrcs.Replace("\"", "\\\""));
+            ss = ss.Replace("{C}", frm.ToString());
+            ss = ss.Replace("{D}", lrc_frm.ToString());
             return ss;
         }
         private class AhhShitPairliCompare : System.Collections.IComparer
@@ -560,7 +619,7 @@ namespace CJCMCG
                 desv = (int)des.Value;
             }));
             Stream inppp = File.Open(filein, FileMode.Open, FileAccess.Read, FileShare.Read);
-            while (!filein.EndsWith(".mid"))
+            while (!filein.EndsWith(".mid") && !filein.EndsWith(".cjcmcg"))
             {
                 if (filein.EndsWith(".xz"))
                 {
@@ -595,240 +654,291 @@ namespace CJCMCG
                 if (b == -1) throw new Exception("Unexpected file end");
                 return b;
             }
-            for (int i = 0; i < 4; ++i)
-            {
-                ReadByte();
-            }
-            for (int i = 0; i < 4; ++i)
-            {
-                ReadByte();
-            }
-            ReadByte();
-            ReadByte();
-            int trkcnt;
-            trkcnt = (toint(ReadByte()) * 256) + toint(ReadByte());
-            resol = (toint(ReadByte()) * 256) + toint(ReadByte());
-            ArrayList bpm = new ArrayList();
-            bpm.Add(new pairli(0, 5000000000.0 / resol, -1, 0));
-            long noteall = 0;
-            int nowtrk = 1;
-            int alltic = 0;
-            int allticreal = 0;
             ArrayList nts = new ArrayList(), nto = new ArrayList();
             ArrayList lrcs = new ArrayList();
-            lrcs.Add(new pairls(0, "", -1, -1));
-            for (int trk = 0; trk < trkcnt; trk++)
+            ArrayList bpm = new ArrayList();
+            bool isPre = filein.EndsWith(".cjcmcg");
+            long noteall = 0;
+            int alltic = 0;
+            if (!isPre)
             {
-                int bpmcnt = 0;
-                int lrccnt = 0;
-                long notes = 0;
-                long leng = 0;
-                ReadByte();
-                ReadByte();
-                ReadByte();
-                ReadByte();
-                for (int i = 0; i < 4; i++)
-                {
-                    leng = leng * 256 + toint(ReadByte());
-                }
-                int lstcmd = 256;
-                Dispatcher.Invoke(new Action(() =>
-                {
-                    string str = prog.Uid;
-                    str = str.Replace("{trackcount}", (trk + 1).ToString() + "/" + trkcnt.ToString()).Replace("{tracksize}", leng.ToString("N0"));
-                    prog.Content = str;
-                }));
-                int getnum()
-                {
-                    int ans = 0;
-                    int ch = 256;
-                    while (ch >= 128)
-                    {
-                        ch = toint(ReadByte());
-                        leng--;
-                        ans = ans * 128 + (ch & 0b01111111);
-                    }
-                    return ans;
-                }
-                int get()
-                {
-                    if (lstcmd != 256)
-                    {
-                        int lstcmd2 = lstcmd;
-                        lstcmd = 256;
-                        return lstcmd2;
-                    }
-                    leng--;
-                    return toint(ReadByte());
-                }
-                int TM = 0;
-                int prvcmd = 256;
-                while (true)
-                {
-                    int added = getnum();
-                    TM += added;
-                    int cmd = ReadByte();
-                    leng--;
-                    if (cmd < 128)
-                    {
-                        lstcmd = cmd;
-                        cmd = prvcmd;
-                    }
-                    prvcmd = cmd;
-                    int cm = cmd & 0b11110000;
-                    if (cm == 0b10010000)
-                    {
-                        get();
-                        ReadByte();
-                        leng--;
-                        while (nts.Count <= TM)
-                        {
-                            nts.Add(0L);
-                        }
-                        nts[TM] = (Convert.ToInt64(nts[TM]) + 1L);
-                        notes++;
-                    }
-                    else if (cm == 0b10000000)
-                    {
-                        get();
-                        ReadByte();
-                        leng--;
-                        while (nto.Count <= TM)
-                        {
-                            nto.Add(0L);
-                        }
-                        nto[TM] = (Convert.ToInt64(nto[TM]) + 1L);
-                    }
-                    else if (cm == 0b11000000 || cm == 0b11010000 || cmd == 0b11110011)
-                    {
-                        get();
-                    }
-                    else if (cm == 0b11100000 || cm == 0b10110000 || cmd == 0b11110010 || cm == 0b10100000)
-                    {
-                        get();
-                        ReadByte();
-                        leng--;
-                    }
-                    else if (cmd == 0b11110000)
-                    {
-                        if (get() == 0b11110111)
-                        {
-                            continue;
-                        }
-                        do
-                        {
-                            leng--;
-                        } while (ReadByte() != 0b11110111);
-                    }
-                    else if (cmd == 0b11110100 || cmd == 0b11110001 || cmd == 0b11110101 || cmd == 0b11111001 || cmd == 0b11111101 || cmd == 0b11110110 || cmd == 0b11110111 || cmd == 0b11111000 || cmd == 0b11111010 || cmd == 0b11111100 || cmd == 0b11111110)
-                    {
-                    }
-                    else if (cmd == 0b11111111)
-                    {
-                        cmd = get();
-                        if (cmd == 0)
-                        {
-                            ReadByte(); ReadByte(); ReadByte();
-                            leng -= 3;
-                        }
-                        else if (cmd >= 1 && cmd <= 10 && cmd != 5 || cmd == 0x7f)
-                        {
-                            long ff = getnum();
-                            while (ff-- > 0)
-                            {
-                                ReadByte();
-                                leng--;
-                            }
-                        }
-                        else if (cmd == 0x20 || cmd == 0x21)
-                        {
-                            ReadByte(); ReadByte(); leng -= 2;
-                        }
-                        else if (cmd == 0x2f)
-                        {
-                            ReadByte();
-                            leng--;
-                            if (TM > allticreal)
-                            {
-                                allticreal = TM;
-                            }
-                            TM -= added;
-                            break;
-                        }
-                        else if (cmd == 0x51)
-                        {
-                            bpmcnt++;
-                            ReadByte();
-                            leng--;
-                            int BPM = get();
-                            BPM = BPM * 256 + get();
-                            BPM = BPM * 256 + get();
-                            bpm.Add(new pairli(TM, 10000.0 * BPM / resol, trk, bpmcnt));
-                        }
-                        else if (cmd == 5)
-                        {
-                            Encoding gb2312 = Encoding.GetEncoding("GB2312");
-                            Encoding def = Encoding.GetEncoding("UTF-8");
-                            lrccnt++;
-                            int ff = (int)getnum();
-                            byte[] S = new byte[ff];
-                            int cnt = 0;
-                            while (ff-- > 0)
-                            {
-                                S[cnt++] = Convert.ToByte(ReadByte());
-                                leng--;
-                            }
-                            S = Encoding.Convert(gb2312, def, S);
-                            lrcs.Add(new pairls(TM, def.GetString(S), trk, lrccnt));
-                        }
-                        else if (cmd == 0x54 || cmd == 0x58)
-                        {
-                            ReadByte(); ReadByte(); ReadByte(); ReadByte(); ReadByte();
-                            leng -= 5;
-                        }
-                        else if (cmd == 0x59)
-                        {
-                            ReadByte(); ReadByte(); ReadByte();
-                            leng -= 3;
-                        }
-                        else if (cmd == 0x0a)
-                        {
-                            int ss = get();
-                            while (ss-- > 0)
-                            {
-                                ReadByte();
-                                leng--;
-                            }
-                        }
-                    }
-                }
-                while (leng > 0)
+                for (int i = 0; i < 4; ++i)
                 {
                     ReadByte();
-                    leng--;
                 }
-                if (TM > alltic)
+                for (int i = 0; i < 4; ++i)
                 {
-                    alltic = TM;
+                    ReadByte();
                 }
-                while (nts.Count <= TM)
+                ReadByte();
+                ReadByte();
+                int trkcnt;
+                trkcnt = (toint(ReadByte()) * 256) + toint(ReadByte());
+                resol = (toint(ReadByte()) * 256) + toint(ReadByte());
+                bpm.Add(new pairli(0, 5000000000.0 / resol, -1, 0));
+                int nowtrk = 1;
+                int allticreal = 0;
+                lrcs.Add(new pairls(0, "", -1, -1));
+                for (int trk = 0; trk < trkcnt; trk++)
                 {
-                    nts.Add(0);
+                    int bpmcnt = 0;
+                    int lrccnt = 0;
+                    long notes = 0;
+                    long leng = 0;
+                    ReadByte();
+                    ReadByte();
+                    ReadByte();
+                    ReadByte();
+                    for (int i = 0; i < 4; i++)
+                    {
+                        leng = leng * 256 + toint(ReadByte());
+                    }
+                    int lstcmd = 256;
+                    Dispatcher.Invoke(new Action(() =>
+                    {
+                        string str = prog.Uid;
+                        str = str.Replace("{trackcount}", (trk + 1).ToString() + "/" + trkcnt.ToString()).Replace("{tracksize}", leng.ToString("N0"));
+                        prog.Content = str;
+                    }));
+                    int getnum()
+                    {
+                        int ans = 0;
+                        int ch = 256;
+                        while (ch >= 128)
+                        {
+                            ch = toint(ReadByte());
+                            leng--;
+                            ans = ans * 128 + (ch & 0b01111111);
+                        }
+                        return ans;
+                    }
+                    int get()
+                    {
+                        if (lstcmd != 256)
+                        {
+                            int lstcmd2 = lstcmd;
+                            lstcmd = 256;
+                            return lstcmd2;
+                        }
+                        leng--;
+                        return toint(ReadByte());
+                    }
+                    int TM = 0;
+                    int prvcmd = 256;
+                    while (true)
+                    {
+                        int added = getnum();
+                        TM += added;
+                        int cmd = ReadByte();
+                        leng--;
+                        if (cmd < 128)
+                        {
+                            lstcmd = cmd;
+                            cmd = prvcmd;
+                        }
+                        prvcmd = cmd;
+                        int cm = cmd & 0b11110000;
+                        if (cm == 0b10010000)
+                        {
+                            get();
+                            ReadByte();
+                            leng--;
+                            while (nts.Count <= TM)
+                            {
+                                nts.Add(0L);
+                            }
+                            while (nto.Count <= TM)
+                            {
+                                nto.Add(0L);
+                            }
+                            nts[TM] = (Convert.ToInt64(nts[TM]) + 1L);
+                            notes++;
+                        }
+                        else if (cm == 0b10000000)
+                        {
+                            get();
+                            ReadByte();
+                            leng--;
+                            while (nts.Count <= TM)
+                            {
+                                nts.Add(0L);
+                            }
+                            while (nto.Count <= TM)
+                            {
+                                nto.Add(0L);
+                            }
+                            nto[TM] = (Convert.ToInt64(nto[TM]) + 1L);
+                        }
+                        else if (cm == 0b11000000 || cm == 0b11010000 || cmd == 0b11110011)
+                        {
+                            get();
+                        }
+                        else if (cm == 0b11100000 || cm == 0b10110000 || cmd == 0b11110010 || cm == 0b10100000)
+                        {
+                            get();
+                            ReadByte();
+                            leng--;
+                        }
+                        else if (cmd == 0b11110000)
+                        {
+                            if (get() == 0b11110111)
+                            {
+                                continue;
+                            }
+                            do
+                            {
+                                leng--;
+                            } while (ReadByte() != 0b11110111);
+                        }
+                        else if (cmd == 0b11110100 || cmd == 0b11110001 || cmd == 0b11110101 || cmd == 0b11111001 || cmd == 0b11111101 || cmd == 0b11110110 || cmd == 0b11110111 || cmd == 0b11111000 || cmd == 0b11111010 || cmd == 0b11111100 || cmd == 0b11111110)
+                        {
+                        }
+                        else if (cmd == 0b11111111)
+                        {
+                            cmd = get();
+                            if (cmd == 0)
+                            {
+                                ReadByte(); ReadByte(); ReadByte();
+                                leng -= 3;
+                            }
+                            else if (cmd >= 1 && cmd <= 10 && cmd != 5 || cmd == 0x7f)
+                            {
+                                long ff = getnum();
+                                while (ff-- > 0)
+                                {
+                                    ReadByte();
+                                    leng--;
+                                }
+                            }
+                            else if (cmd == 0x20 || cmd == 0x21)
+                            {
+                                ReadByte(); ReadByte(); leng -= 2;
+                            }
+                            else if (cmd == 0x2f)
+                            {
+                                ReadByte();
+                                leng--;
+                                if (TM > allticreal)
+                                {
+                                    allticreal = TM;
+                                }
+                                TM -= added;
+                                break;
+                            }
+                            else if (cmd == 0x51)
+                            {
+                                bpmcnt++;
+                                ReadByte();
+                                leng--;
+                                int BPM = get();
+                                BPM = BPM * 256 + get();
+                                BPM = BPM * 256 + get();
+                                bpm.Add(new pairli(TM, 10000.0 * BPM / resol, trk, bpmcnt));
+                            }
+                            else if (cmd == 5)
+                            {
+                                Encoding gb2312 = Encoding.GetEncoding("GBK");
+                                Encoding def = Encoding.GetEncoding("UTF-8");
+                                lrccnt++;
+                                int ff = (int)getnum();
+                                byte[] S = new byte[ff];
+                                int cnt = 0;
+                                while (ff-- > 0)
+                                {
+                                    S[cnt++] = Convert.ToByte(ReadByte());
+                                    leng--;
+                                }
+                                S = Encoding.Convert(gb2312, def, S);
+                                lrcs.Add(new pairls(TM, def.GetString(S), trk, lrccnt));
+                            }
+                            else if (cmd == 0x54 || cmd == 0x58)
+                            {
+                                ReadByte(); ReadByte(); ReadByte(); ReadByte(); ReadByte();
+                                leng -= 5;
+                            }
+                            else if (cmd == 0x59)
+                            {
+                                ReadByte(); ReadByte(); ReadByte();
+                                leng -= 3;
+                            }
+                            else if (cmd == 0x0a)
+                            {
+                                int ss = get();
+                                while (ss-- > 0)
+                                {
+                                    ReadByte();
+                                    leng--;
+                                }
+                            }
+                        }
+                    }
+                    while (leng > 0)
+                    {
+                        ReadByte();
+                        leng--;
+                    }
+                    noteall += notes;
+                    nowtrk++;
                 }
-                while (nto.Count <= TM)
+                Dispatcher.Invoke(new Action(() =>
                 {
-                    nto.Add(0);
-                }
-                noteall += notes;
-                nowtrk++;
+                    prog.SetResourceReference(ContentControl.ContentProperty, "ReadFinished");
+                    string str = (string)prog.Content;
+                    str = str.Replace("{notecnt}", noteall.ToString("N0"));
+                    prog.Content = str;
+                }));
+                alltic = nto.Count;
             }
-            Dispatcher.Invoke(new Action(() =>
+            else
             {
-                prog.SetResourceReference(ContentControl.ContentProperty, "ReadFinished");
-                string str = (string)prog.Content;
-                str = str.Replace("{notecnt}", noteall.ToString("N0"));
-                prog.Content = str;
-            }));
+                resol = 0;
+                for (int i = 0; i < 4; i++)
+                {
+                    resol = resol * 256 + toint(ReadByte());
+                }
+                int bpmcnt = 0;
+                for (int i = 0; i < 4; i++)
+                {
+                    bpmcnt = bpmcnt * 256 + toint(ReadByte());
+                }
+                for (int i = 0; i < bpmcnt; i++)
+                {
+                    int Tm = toint(ReadByte());
+                    Tm = Tm * 256 + toint(ReadByte());
+                    Tm = Tm * 256 + toint(ReadByte());
+                    Tm = Tm * 256 + toint(ReadByte());
+                    int BPM = toint(ReadByte());
+                    BPM = BPM * 256 + toint(ReadByte());
+                    BPM = BPM * 256 + toint(ReadByte());
+                    bpm.Add(new pairli(Tm, 10000.0 * BPM / resol, 0, i));
+                }
+                int lrccnt = 0;
+                for (int i = 0; i < 4; i++)
+                {
+                    lrccnt = lrccnt * 256 + toint(ReadByte());
+                }
+                for (int i = 0; i < lrccnt; i++)
+                {
+                    int Tm = toint(ReadByte());
+                    Tm = Tm * 256 + toint(ReadByte());
+                    Tm = Tm * 256 + toint(ReadByte());
+                    Tm = Tm * 256 + toint(ReadByte());
+                    int Siz = toint(ReadByte());
+                    Siz = Siz * 256 + toint(ReadByte());
+                    Siz = Siz * 256 + toint(ReadByte());
+                    Siz = Siz * 256 + toint(ReadByte());
+                    List<byte> arr = new List<byte>();
+                    for (int j = 0; j < Siz; j++)
+                        arr.Add((byte)ReadByte());
+                    lrcs.Add(new pairls(Tm, Encoding.UTF8.GetString(arr.ToArray()), 0, i));
+                }
+                noteall = getNum();
+                alltic = 0;
+                for (int i = 0; i < 4; i++)
+                {
+                    alltic = alltic * 256 + toint(ReadByte());
+                }
+            }
             bpm.Sort(new AhhShitPairliCompare());
             lrcs.Sort(new AhhShitPairlsCompare());
             double[] tmc = new double[bpm.Count];
@@ -837,11 +947,26 @@ namespace CJCMCG
             {
                 tmc[i] = tmc[i - 1] + (((pairli)bpm[i]).x - ((pairli)bpm[i - 1]).x) * ((pairli)bpm[i - 1]).y / 10000.0;
             }
+            Process natsu = Natsulang();
+            if (natsu == null)
+            {
+            	return;
+            }
             ff = startNewSSFF(W, H, F, fileout);
             int tmdf = 0;
             for (int i = 0; i < F * desv; i++)
             {
-                string s = getstring(0, noteall, 120, 0, 0, 0, 0, alltic);
+                string s = getstring(0, noteall, 120, 0, 0, 0, 0, alltic, tmdf) + patt + "{'\\0'}";
+                natsu.StandardInput.Write(s);
+                natsu.StandardInput.Flush();
+                List<byte> byteArray = new List<byte>();
+                int ch = natsu.StandardOutput.BaseStream.ReadByte();
+                while (ch != 0)
+                {
+                    byteArray.Add((byte)ch);
+                    ch = natsu.StandardOutput.BaseStream.ReadByte();
+                }
+                s = System.Text.Encoding.Default.GetString(byteArray.ToArray());
                 newframe(W, H, s);
                 Dispatcher.Invoke(new Action(() =>
                 {
@@ -859,23 +984,56 @@ namespace CJCMCG
             int now = 0;
             long notecnt = 0;
             int tmm = 0, nowlrc = 0, bpmptr = 0;
-            while (now < nts.Count)
+            long lrcf = 0;
+            long getNum()
+            {
+                long ans = 0;
+                int ch = 256;
+                while (ch >= 128)
+                {
+                    ch = toint(ReadByte());
+                    ans = ans * 128 + (ch & 0b01111111);
+                }
+                return ans;
+            }
+            while (now < alltic || poly > 0)
             {
                 for (; now <= tmm; now++)
                 {
-                    if (now >= nts.Count)
+                    if (now >= alltic)
                     {
                         break;
                     }
-                    notecnt += Convert.ToInt64(nts[now]);
-                    poly += Convert.ToInt64(nts[now]);
-                    poly -= Convert.ToInt64(nto[now]);
+                    if (isPre)
+                    {
+                        long jar = getNum();
+                        notecnt += jar;
+                        poly += jar;
+                        poly -= getNum();
+                    }
+                    else
+                    {
+                        notecnt += Convert.ToInt64(nts[now]);
+                        poly += Convert.ToInt64(nts[now]);
+                        poly -= Convert.ToInt64(nto[now]);
+                    }
                 }
                 while (nowlrc < lrcs.Count - 1 && ((pairls)lrcs[nowlrc + 1]).x <= tmm)
                 {
                     nowlrc++;
+                    lrcf = 0;
                 }
-                string s = getstring(notecnt, noteall, 600000000000.0 / resol / ((pairli)bpm[bpmptr]).y, 1.0 * (tmdf - F * desv) / F, notecnt - history[tmdf % F], poly, tmm > alltic ? alltic : Convert.ToInt64(tmm), alltic, ((pairls)lrcs[nowlrc]).y);
+                string s = getstring(notecnt, noteall, 600000000000.0 / resol / ((pairli)bpm[bpmptr]).y, 1.0 * (tmdf - F * desv) / F, notecnt - history[tmdf % F], poly, tmm > alltic ? alltic : Convert.ToInt64(tmm), alltic, tmdf, ((pairls)lrcs[nowlrc]).y, lrcf) + patt + "{'\\0'}";
+                natsu.StandardInput.Write(s);
+                natsu.StandardInput.Flush();
+                List<byte> byteArray = new List<byte>();
+                int ch = natsu.StandardOutput.BaseStream.ReadByte();
+                while (ch != 0)
+                {
+                    byteArray.Add((byte)ch);
+                    ch = natsu.StandardOutput.BaseStream.ReadByte();
+                }
+                s = System.Text.Encoding.Default.GetString(byteArray.ToArray());
                 newframe(W, H, s);
                 history[tmdf % F] = notecnt;
                 Dispatcher.Invoke(new Action(() =>
@@ -893,10 +1051,21 @@ namespace CJCMCG
                     bpmptr++;
                 }
                 tmm = Convert.ToInt32(((pairli)bpm[bpmptr]).x + (tmnow - tmc[bpmptr]) * 10000.0 / ((pairli)bpm[bpmptr]).y);
+                lrcf++;
             }
             for (int i = 0; i < 5 * F; i++)
             {
-                string s = getstring(noteall, noteall, 600000000000.0 / resol / ((pairli)bpm[bpmptr]).y, 1.0 * (tmdf - F * desv) / F, notecnt - history[tmdf % F], 0, alltic, alltic);
+                string s = getstring(noteall, noteall, 600000000000.0 / resol / ((pairli)bpm[bpmptr]).y, 1.0 * (tmdf - F * desv) / F, notecnt - history[tmdf % F], 0, alltic, alltic, tmdf) + patt + "{'\\0'}";
+                natsu.StandardInput.Write(s);
+                natsu.StandardInput.Flush();
+                List<byte> byteArray = new List<byte>();
+                int ch = natsu.StandardOutput.BaseStream.ReadByte();
+                while (ch != 0)
+                {
+                    byteArray.Add((byte)ch);
+                    ch = natsu.StandardOutput.BaseStream.ReadByte();
+                }
+                s = System.Text.Encoding.Default.GetString(byteArray.ToArray());
                 newframe(W, H, s);
                 Dispatcher.Invoke(new Action(() =>
                 {
