@@ -55,7 +55,7 @@ Generate a counter for a midi.
 + At least Windows 7 SP1
 + FFmpeg and FFplay installed
 + Xz installed (to decompress a file faster and better in CJCMCG)
-+ Python 3 installed (if you use CJCMCG)
++ Python 3 and [natsulang](https://github.com/CJC-Apps/natsulang) installed (if you use CJCMCG)
 
 ## About credit
 
