@@ -1,19 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace CJC_Toolbox
 {
@@ -26,15 +15,15 @@ namespace CJC_Toolbox
         {
             InitializeComponent();
         }
-        public void CJCAMM_Clicked(object sender,RoutedEventArgs e)
+        public void CJCAMM_Clicked(object sender, RoutedEventArgs e)
         {
             Process.Start(System.Windows.Forms.Application.ExecutablePath, "CJCAMM " + ((string)((ComboBoxItem)Language.SelectedItem).Uid));
         }
-        public void CJCOR_Clicked(object sender,RoutedEventArgs e)
+        public void CJCOR_Clicked(object sender, RoutedEventArgs e)
         {
             Process.Start(System.Windows.Forms.Application.ExecutablePath, "CJCOR " + ((string)((ComboBoxItem)Language.SelectedItem).Uid));
         }
-        public void CJCMCG_Clicked(object sender,RoutedEventArgs e)
+        public void CJCMCG_Clicked(object sender, RoutedEventArgs e)
         {
             Process.Start(System.Windows.Forms.Application.ExecutablePath, "CJCMCG " + ((string)((ComboBoxItem)Language.SelectedItem).Uid));
         }

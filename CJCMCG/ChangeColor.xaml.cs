@@ -1,16 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
+﻿using System.Windows;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
 namespace CJCMCG
 {
@@ -27,7 +16,7 @@ namespace CJCMCG
             InitializeComponent();
         }
 
-        private double GetYuv(double R,double G,double B)
+        private double GetYuv(double R, double G, double B)
         {
             return 0.299 * R + 0.587 * G + 0.114 * B;
         }
@@ -44,9 +33,9 @@ namespace CJCMCG
                 return;
             }
             okkey.Background = new SolidColorBrush(Color.FromArgb((byte)Aval.Value, (byte)Rval.Value, (byte)Gval.Value, (byte)Bval.Value));
-            if(GetYuv(255 - ((double)Aval.Value) / 255.0 * (255 - (double)Rval.Value), 255 - ((double)Aval.Value) / 255.0 * (255 - (double)Gval.Value), 255 - ((double)Aval.Value) / 255.0 * (255 - (double)Bval.Value)) < 100)
+            if (GetYuv(255 - ((double)Aval.Value) / 255.0 * (255 - (double)Rval.Value), 255 - ((double)Aval.Value) / 255.0 * (255 - (double)Gval.Value), 255 - ((double)Aval.Value) / 255.0 * (255 - (double)Bval.Value)) < 100)
             {
-                okkey.Foreground= new SolidColorBrush(Color.FromRgb(255, 255, 255));
+                okkey.Foreground = new SolidColorBrush(Color.FromRgb(255, 255, 255));
             }
             else
             {

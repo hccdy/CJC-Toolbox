@@ -1,18 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
 namespace CJC_Advanced_Midi_Merger
 {
@@ -41,7 +31,7 @@ namespace CJC_Advanced_Midi_Merger
             int trkcnt = buff.ReadByte();
             trkcnt = trkcnt * 256 + buff.ReadByte();
             buff.ReadByte(); buff.ReadByte();
-            for(int trk = 0; trk < trkcnt; trk++)
+            for (int trk = 0; trk < trkcnt; trk++)
             {
                 for (int i = 0; i < 4; i++)
                 {

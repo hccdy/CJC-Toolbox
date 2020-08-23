@@ -1,21 +1,11 @@
 ﻿using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.IO;
-using System.Linq;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using static CJC_Advanced_Midi_Merger.MainWindow;
 
 namespace CJC_Advanced_Midi_Merger
@@ -52,7 +42,8 @@ namespace CJC_Advanced_Midi_Merger
             open.Multiselect = true;
             if ((bool)open.ShowDialog())
             {
-                foreach (string i in open.FileNames) {
+                foreach (string i in open.FileNames)
+                {
                     ListBoxItem itm = new ListBoxItem();
                     itm.Content = i;
                     itm.DataContext = new Sts();
@@ -75,7 +66,7 @@ namespace CJC_Advanced_Midi_Merger
             MidisAdded.Items.Clear();
         }
         [STAThread]
-        public void OpenSettings(object sender,RoutedEventArgs w)
+        public void OpenSettings(object sender, RoutedEventArgs w)
         {
             if (MidisAdded.SelectedItem == null)
             {
@@ -90,7 +81,7 @@ namespace CJC_Advanced_Midi_Merger
             itm.DataContext = stss.stt;
             MidisAdded.SelectedItem = itm;
         }
-        public void GetInfo(object sender,RoutedEventArgs w)
+        public void GetInfo(object sender, RoutedEventArgs w)
         {
             if (MidisAdded.SelectedItem == null)
             {
@@ -149,7 +140,7 @@ namespace CJC_Advanced_Midi_Merger
             Stream gro = File.Open(output, FileMode.Create, FileAccess.Write, FileShare.Write);
             string head = "Hccdymerge  ";
             byte[] Head = new byte[12];
-            for(int i = 0; i < 12; i++)
+            for (int i = 0; i < 12; i++)
             {
                 Head[i] = (byte)head[i];
             }
@@ -159,11 +150,11 @@ namespace CJC_Advanced_Midi_Merger
             go.Add((byte)(Convert.ToInt32(sfg.ppq.Value) % 256));
             go.Add((byte)0);
             go.Add((byte)1);
-            for(int i = 0; i < MidisAdded.Items.Count; i++)
+            for (int i = 0; i < MidisAdded.Items.Count; i++)
             {
                 string file = (string)((ListBoxItem)MidisAdded.Items[i]).Content;
                 byte[] arr = Encoding.UTF8.GetBytes(file);
-                for(int j = 0; j < arr.Length; j++)
+                for (int j = 0; j < arr.Length; j++)
                 {
                     go.Add((byte)arr[j]);
                 }
@@ -216,7 +207,7 @@ namespace CJC_Advanced_Midi_Merger
             gro.Close();
         }
 
-        public void LoadGroup(object sender,RoutedEventArgs e)
+        public void LoadGroup(object sender, RoutedEventArgs e)
         {
             string infile;
             var sfg = new OpenFileDialog();
@@ -231,7 +222,7 @@ namespace CJC_Advanced_Midi_Merger
             }
             Stream gro = File.Open(infile, FileMode.Open, FileAccess.Read, FileShare.Read);
             string head = "Hccdymerge  ";
-            for(int i = 0; i < 12; i++)
+            for (int i = 0; i < 12; i++)
             {
                 if (head[i] != (char)gro.ReadByte())
                 {
@@ -282,7 +273,7 @@ namespace CJC_Advanced_Midi_Merger
                     if (ch == 'o')
                     {
                         int offst = 0;
-                        for(int j = 0; j < 4; j++)
+                        for (int j = 0; j < 4; j++)
                         {
                             int sh = gro.ReadByte();
                             if (sh == -1)
@@ -357,7 +348,7 @@ namespace CJC_Advanced_Midi_Merger
             grp.file = filename;
             if (!filename.EndsWith(".cjcamm"))
             {
-                for(int i = 0; i < 12; i++)
+                for (int i = 0; i < 12; i++)
                 {
                     ins.ReadByte();
                 }
@@ -368,7 +359,7 @@ namespace CJC_Advanced_Midi_Merger
             }
             else
             {
-                for(int i = 0; i < 12; i++)
+                for (int i = 0; i < 12; i++)
                 {
                     ins.ReadByte();
                 }
@@ -466,7 +457,7 @@ namespace CJC_Advanced_Midi_Merger
             return grp;
         }
 
-        public void StartRender(object sender,RoutedEventArgs e)
+        public void StartRender(object sender, RoutedEventArgs e)
         {
             Groups grp = new Groups();
             grp.ms = new List<Groups>();
@@ -537,7 +528,7 @@ namespace CJC_Advanced_Midi_Merger
                 return;
             }
             string[] filenames = (string[])e.Data.GetData(DataFormats.FileDrop);
-            for(int i = 0; i < filenames.Length; i++)
+            for (int i = 0; i < filenames.Length; i++)
             {
                 string s = filenames[i];
                 if (!s.EndsWith(".mid") && !s.EndsWith(".midi") && !s.EndsWith(".cjcamm"))
@@ -578,7 +569,7 @@ namespace CJC_Advanced_Midi_Merger
             }
         }
 
-        private void Dragovertolist(object sender,DragEventArgs e)
+        private void Dragovertolist(object sender, DragEventArgs e)
         {
             if (!e.Data.GetDataPresent(DataFormats.FileDrop))
             {

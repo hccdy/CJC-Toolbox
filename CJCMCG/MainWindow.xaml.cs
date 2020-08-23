@@ -1,30 +1,23 @@
 ﻿using Microsoft.Win32;
+using SharpCompress.Archives.GZip;
+using SharpCompress.Archives.Rar;
+using SharpCompress.Archives.SevenZip;
+using SharpCompress.Archives.Tar;
+using SharpCompress.Compressors.Xz;
 using System;
-using System.Drawing;
+using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Drawing;
+using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
-using static CJCMCG.MainWindow;
-using System.IO;
-using SharpCompress.Archives.Tar;
-using SharpCompress.Archives.SevenZip;
-using SharpCompress.Archives.Rar;
-using SharpCompress.Archives.Zip;
-using System.Diagnostics;
-using SharpCompress.Archives.GZip;
-using System.IO.Compression;
-using SharpCompress.Compressors.Xz;
-using System.Collections;
-using System.Threading;
 
 namespace CJCMCG
 {
@@ -204,7 +197,7 @@ namespace CJCMCG
         }
 
         public static string[] oldList = { "{0}", "{0,}", "{1}", "{1,}", "{1-0}", "{1-0,}", "{2}", "{3}", "{4}", "{4,}", "{5}", "{5,}", "{6}", "{6,}", "{7}", "{7,}", "{7-6}", "{7-6,}", "{8}", "{9}", "{9-8}", "{A,}", "{A}", "{B}" };
-        public static string[] newList = { "{nc}", "{format(nc,',')}", "{an}", "{format(an,',')}", "{an-nc}", "{format(an-nc,',')}", "{bpm}", "{format(tm,".2f")}", "{nps}", "{format(nps,',')}", "{pol}", "{format(pol,',')}", "{tic}", "{format(tic,',')}", "{ati}", "{format(ati,',')}", "{ati-tic}", "{format(ati-tic,',')}", "{bts}", "{abt}", "{abt-bts}", "{format(ppq,',')}", "{ppq}", "{lrc}" };
+        public static string[] newList = { "{nc}", "{format(nc,',')}", "{an}", "{format(an,',')}", "{an-nc}", "{format(an-nc,',')}", "{bpm}", "{format(tm,\".2f\")}", "{nps}", "{format(nps,',')}", "{pol}", "{format(pol,',')}", "{tic}", "{format(tic,',')}", "{ati}", "{format(ati,',')}", "{ati-tic}", "{format(ati-tic,',')}", "{bts}", "{abt}", "{abt-bts}", "{format(ppq,',')}", "{ppq}", "{lrc}" };
 
         private void pats_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
@@ -215,7 +208,7 @@ namespace CJCMCG
             RegistryKey reg = Registry.CurrentUser.OpenSubKey(@"Software\CJCMCG\" + ((ComboBoxItem)pats.SelectedItem).Uid, true);
             fsize.Value = Convert.ToInt32(reg.GetValue("FontSize"));
             string fface = (string)reg.GetValue("FontFace");
-            foreach(ComboBoxItem item in font.Items)
+            foreach (ComboBoxItem item in font.Items)
             {
                 if (item.Uid == fface)
                 {
@@ -230,7 +223,7 @@ namespace CJCMCG
             UInt32 col = Convert.ToUInt32(coll < 0 ? coll + (1L << 32) : coll);
             color.Background = new SolidColorBrush(System.Windows.Media.Color.FromArgb((byte)(col / 256 / 256 / 256), (byte)(col / 256 / 256 % 256), (byte)(col / 256 % 256), (byte)(col % 256)));
             bool isnew = false;
-            for(int i = 0; i < oldList.Length - 2; i++)
+            for (int i = 0; i < oldList.Length - 2; i++)
             {
                 if (pattt.IndexOf(oldList[i]) > -1)
                 {
@@ -241,7 +234,7 @@ namespace CJCMCG
             {
                 if (MessageBox.Show(pat.Uid, color.Uid, MessageBoxButton.YesNo).ToString() == "Yes")
                 {
-                    for(int i = 0; i < oldList.Length; i++)
+                    for (int i = 0; i < oldList.Length; i++)
                     {
                         pattt = pattt.Replace(oldList[i], newList[i]);
                     }
@@ -268,13 +261,14 @@ namespace CJCMCG
 
         private void fonts_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-        	pat.FontFamily = new System.Windows.Media.FontFamily(((ComboBoxItem)(font.SelectedItem)).Uid);
-        	preview.FontFamily = new System.Windows.Media.FontFamily(((ComboBoxItem)(font.SelectedItem)).Uid);
+            pat.FontFamily = new System.Windows.Media.FontFamily(((ComboBoxItem)(font.SelectedItem)).Uid);
+            preview.FontFamily = new System.Windows.Media.FontFamily(((ComboBoxItem)(font.SelectedItem)).Uid);
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            try {
+            try
+            {
                 Process ffmpeg = new Process();
                 ffmpeg.StartInfo = new ProcessStartInfo("ffmpeg", "-h");
                 ffmpeg.StartInfo.RedirectStandardInput = false;
@@ -282,9 +276,25 @@ namespace CJCMCG
                 ffmpeg.StartInfo.UseShellExecute = false;
                 ffmpeg.StartInfo.RedirectStandardError = false;
                 ffmpeg.Start();
-            } catch (Exception)
+            }
+            catch (Exception)
             {
                 MessageBox.Show("There was an error finding ffmpeg.\nIs ffmpeg.exe in the same folder as this program?");
+                Close();
+            }
+            try
+            {
+                Process ffmpeg = new Process();
+                ffmpeg.StartInfo = new ProcessStartInfo("natsulang", "-h");
+                ffmpeg.StartInfo.RedirectStandardInput = false;
+                ffmpeg.StartInfo.CreateNoWindow = true;
+                ffmpeg.StartInfo.UseShellExecute = false;
+                ffmpeg.StartInfo.RedirectStandardError = false;
+                ffmpeg.Start();
+            }
+            catch (Exception)
+            {
+                MessageBox.Show("There was an error finding natsulang.\nPlease install Python 3 and type 'pip install natsulang' to install.");
                 Close();
             }
             System.Drawing.Text.InstalledFontCollection fonts = new System.Drawing.Text.InstalledFontCollection();
@@ -392,7 +402,7 @@ namespace CJCMCG
                     RedirectStandardOutput = true,
                     RedirectStandardInput = true,
                     UseShellExecute = false,
-                	CreateNoWindow = true
+                    CreateNoWindow = true
                 };
                 xz.Start();
                 Task.Run(() =>
@@ -478,7 +488,7 @@ namespace CJCMCG
             try
             {
                 Process ntl = new Process();
-                ntl.StartInfo = new ProcessStartInfo("python", "natsulang.pyo -s")
+                ntl.StartInfo = new ProcessStartInfo("natsulang", "-s")
                 {
                     RedirectStandardOutput = true,
                     RedirectStandardInput = true,
@@ -491,8 +501,8 @@ namespace CJCMCG
             }
             catch (Exception)
             {
-                MessageBox.Show("python not found, please install python version >=3.0.0 and add it to PATH.");
-                return null;
+                MessageBox.Show("Natsulang not installed. Please type pip install natsulang to install.");
+                throw new Exception("Natsulang not installed");
             }
         }
         int toint(int x)
@@ -510,7 +520,8 @@ namespace CJCMCG
                 using (var gfx = Graphics.FromImage(img))
                 {
                     gfx.FillRectangle(System.Drawing.Brushes.Transparent, 0, 0, W, H);
-                    Dispatcher.Invoke(new Action(() => {
+                    Dispatcher.Invoke(new Action(() =>
+                    {
                         using (var textBrush = new SolidBrush(System.Drawing.Color.FromArgb(colsel.Color.A, colsel.Color.R, colsel.Color.G, colsel.Color.B)))
                         {
                             gfx.DrawString(pat, fon, textBrush, new PointF(0, 0));
@@ -950,7 +961,7 @@ namespace CJCMCG
             Process natsu = Natsulang();
             if (natsu == null)
             {
-            	return;
+                return;
             }
             ff = startNewSSFF(W, H, F, fileout);
             int tmdf = 0;
@@ -1090,7 +1101,7 @@ namespace CJCMCG
                 prog.IsEnabled = true;
             }));
         }
-        public void progress_Click(object sender,RoutedEventArgs e)
+        public void progress_Click(object sender, RoutedEventArgs e)
         {
             filein = (string)filename.Content;
             filename.IsEnabled = false;

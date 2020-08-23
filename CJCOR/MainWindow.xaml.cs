@@ -3,19 +3,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
-using static CJCOR.MainWindow;
 
 namespace CJCOR
 {
@@ -287,7 +277,7 @@ namespace CJCOR
                 {
                     Progress.SetResourceReference(ContentControl.ContentProperty, "Parsingtrack");
                     Progress.Content = ((string)(Progress.Content)).Replace("{trackcount}", (trk + 1).ToString() + "/" + trkcnt.ToString());
-                    Progress.Content=((string)(Progress.Content)).Replace("{tracksize}", leng.ToString());
+                    Progress.Content = ((string)(Progress.Content)).Replace("{tracksize}", leng.ToString());
                 }));
                 ArrayList[] offs = new ArrayList[4096];
                 for (int i = 0; i < 4096; i++)
@@ -806,7 +796,7 @@ namespace CJCOR
                 MessageBox.Show(((string)IsAud.DataContext) + fileout);
             }));
         }
-        public void StartButtonPressed(object sender,RoutedEventArgs e)
+        public void StartButtonPressed(object sender, RoutedEventArgs e)
         {
             Thread th = new Thread(Begin);
             th.Start();

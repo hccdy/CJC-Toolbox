@@ -74,9 +74,9 @@
     <s:String x:Key="UpdateOld">更新模板?</s:String>
     <s:String x:Key="cjcmcg_help" xml:space="preserve">软件由CJC Apps制作。请确认程序所在的文件夹中或C:\Windows\System32中有ffmpeg.exe。如果没有，你可以在http://ffmpeg.org下载。同时也推荐下载xz.exe，以免在MIDI解压缩过程中出现异常。
 
-请确认你已经安装了Python 3，并且将Python 3的可执行文件所在目录加入到了PATH中，以便正常运行natsulang。
+请确认你已经安装了Python 3，将Python 3的可执行文件所在目录加入到了PATH中，并且已经通过pip安装了natsulang，以便正常运行natsulang。
 
-程序使用natsulang来生成计数君，这是由双笙黑粉后援会制作的文字处理语言。请确保natsulang.pyo文件和本程序在同一个文件夹中。
+程序使用natsulang来生成计数君，这是由双笙黑粉后援会制作的文字处理语言。
 
 Natsulang程序中支持以下变量：
   frm: 当前视频帧数（从0开始）
