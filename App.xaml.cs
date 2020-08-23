@@ -12,14 +12,14 @@ namespace CJC_Toolbox
         private void LanguageChange(string s)
         {
             List<ResourceDictionary> dictionaryList = new List<ResourceDictionary>();
-            foreach (ResourceDictionary dictionary in Application.Current.Resources.MergedDictionaries)
+            foreach (ResourceDictionary dictionary in Current.Resources.MergedDictionaries)
             {
                 dictionaryList.Add(dictionary);
             }
             string requestedCulture = @"Resources\" + s + ".xaml";
             ResourceDictionary resourceDictionary = dictionaryList.FirstOrDefault(d => d.Source.OriginalString.Equals(requestedCulture));
-            Application.Current.Resources.MergedDictionaries.Remove(resourceDictionary);
-            Application.Current.Resources.MergedDictionaries.Add(resourceDictionary);
+            Current.Resources.MergedDictionaries.Remove(resourceDictionary);
+            Current.Resources.MergedDictionaries.Add(resourceDictionary);
         }
         private void StartApplication(object sender, StartupEventArgs e)
         {

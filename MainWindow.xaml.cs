@@ -17,15 +17,15 @@ namespace CJC_Toolbox
         }
         public void CJCAMM_Clicked(object sender, RoutedEventArgs e)
         {
-            Process.Start(System.Windows.Forms.Application.ExecutablePath, "CJCAMM " + ((string)((ComboBoxItem)Language.SelectedItem).Uid));
+            Process.Start(System.Windows.Forms.Application.ExecutablePath, "CJCAMM " + ((ComboBoxItem)Language.SelectedItem).Uid);
         }
         public void CJCOR_Clicked(object sender, RoutedEventArgs e)
         {
-            Process.Start(System.Windows.Forms.Application.ExecutablePath, "CJCOR " + ((string)((ComboBoxItem)Language.SelectedItem).Uid));
+            Process.Start(System.Windows.Forms.Application.ExecutablePath, "CJCOR " + ((ComboBoxItem)Language.SelectedItem).Uid);
         }
         public void CJCMCG_Clicked(object sender, RoutedEventArgs e)
         {
-            Process.Start(System.Windows.Forms.Application.ExecutablePath, "CJCMCG " + ((string)((ComboBoxItem)Language.SelectedItem).Uid));
+            Process.Start(System.Windows.Forms.Application.ExecutablePath, "CJCMCG " + ((ComboBoxItem)Language.SelectedItem).Uid);
         }
         private void Language_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
@@ -34,7 +34,7 @@ namespace CJC_Toolbox
             {
                 dictionaryList.Add(dictionary);
             }
-            string requestedCulture = @"Resources\" + ((string)((ComboBoxItem)Language.SelectedItem).Uid) + ".xaml";
+            string requestedCulture = @"Resources\" + ((ComboBoxItem)Language.SelectedItem).Uid + ".xaml";
             ResourceDictionary resourceDictionary = dictionaryList.FirstOrDefault(d => d.Source.OriginalString.Equals(requestedCulture));
             Application.Current.Resources.MergedDictionaries.Remove(resourceDictionary);
             Application.Current.Resources.MergedDictionaries.Add(resourceDictionary);

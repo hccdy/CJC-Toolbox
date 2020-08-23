@@ -26,8 +26,10 @@ namespace CJCMCG
             string[] nm = key.GetSubKeyNames();
             foreach (string s in nm)
             {
-                ListBoxItem item = new ListBoxItem();
-                item.Content = s;
+                ListBoxItem item = new ListBoxItem
+                {
+                    Content = s
+                };
                 ls.Items.Add(item);
             }
         }
@@ -60,8 +62,10 @@ namespace CJCMCG
             string[] nm = key.GetSubKeyNames();
             foreach (string s in nm)
             {
-                ListBoxItem item = new ListBoxItem();
-                item.Content = s;
+                ListBoxItem item = new ListBoxItem
+                {
+                    Content = s
+                };
                 ls.Items.Add(item);
             }
         }
@@ -72,8 +76,10 @@ namespace CJCMCG
             string[] nm = reg.GetSubKeyNames();
             foreach (string s in nm)
             {
-                ListBoxItem item = new ListBoxItem();
-                item.Content = s;
+                ListBoxItem item = new ListBoxItem
+                {
+                    Content = s
+                };
                 ls.Items.Add(item);
             }
         }

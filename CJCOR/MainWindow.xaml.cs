@@ -11,7 +11,7 @@ namespace CJCOR
 {
     public partial class MainWindow : Window
     {
-        class Node
+        private class Node
         {
             public int l, r;
             public Node nxt, lst;
@@ -23,7 +23,7 @@ namespace CJCOR
                 lst = null;
             }
         }
-        public static String filein, fileout;
+        public static string filein, fileout;
         public int toint(int x)
         {
             if (x < 0)
@@ -49,7 +49,11 @@ namespace CJCOR
             int ReadByte()
             {
                 int b = inp.ReadByte();
-                if (b == -1) throw new Exception("Unexpected file end");
+                if (b == -1)
+                {
+                    throw new Exception("Unexpected file end");
+                }
+
                 return b;
             }
             for (int i = 0; i < 10; i++)
@@ -86,7 +90,7 @@ namespace CJCOR
                     }
                     Dispatcher.Invoke(new Action(() =>
                     {
-                        Progress.SetResourceReference(ContentControl.ContentProperty, "Prereading");
+                        Progress.SetResourceReference(ContentProperty, "Prereading");
                         Progress.Content = ((string)(Progress.Content)).Replace("{trackcount}", (trk + 1).ToString() + "/" + trkcnt.ToString());
                     }));
                     int lstcmd = 256;
@@ -133,7 +137,7 @@ namespace CJCOR
                             byte vel = (byte)ReadByte();
                             while (Snd[nt].Count <= TM)
                             {
-                                Snd[nt].Add((byte)0);
+                                Snd[nt].Add(0);
                             }
                             if (Snd[nt][TM] < vel)
                             {
@@ -203,7 +207,7 @@ namespace CJCOR
                             }
                             else if (cmd == 5)
                             {
-                                int ff = (int)getnum();
+                                int ff = getnum();
                                 while (ff-- > 0)
                                 {
                                     ReadByte();
@@ -246,7 +250,7 @@ namespace CJCOR
                     trkpos[trkcnt - trk - 1] = inp.Position;
                     Dispatcher.Invoke(new Action(() =>
                     {
-                        Progress.SetResourceReference(ContentControl.ContentProperty, "Prereading");
+                        Progress.SetResourceReference(ContentProperty, "Prereading");
                         Progress.Content = ((string)(Progress.Content)).Replace("{trackcount}", (trk + 1).ToString() + "/" + trkcnt.ToString());
                     }));
                     st.ReadByte(); st.ReadByte(); st.ReadByte(); st.ReadByte();
@@ -275,7 +279,7 @@ namespace CJCOR
                 }
                 Dispatcher.Invoke(new Action(() =>
                 {
-                    Progress.SetResourceReference(ContentControl.ContentProperty, "Parsingtrack");
+                    Progress.SetResourceReference(ContentProperty, "Parsingtrack");
                     Progress.Content = ((string)(Progress.Content)).Replace("{trackcount}", (trk + 1).ToString() + "/" + trkcnt.ToString());
                     Progress.Content = ((string)(Progress.Content)).Replace("{tracksize}", leng.ToString());
                 }));
@@ -405,7 +409,7 @@ namespace CJCOR
                         }
                         else if (cmd == 5)
                         {
-                            int ff = (int)getnum();
+                            int ff = getnum();
                             while (ff-- > 0)
                             {
                                 ReadByte();
@@ -461,8 +465,10 @@ namespace CJCOR
                 long lsttm = 0;
                 void outtimetooutstr(long tm)
                 {
-                    List<byte> str = new List<byte>();
-                    str.Add((byte)(tm % 128));
+                    List<byte> str = new List<byte>
+                    {
+                        (byte)(tm % 128)
+                    };
                     tm /= 128;
                     while (tm > 0)
                     {
@@ -710,7 +716,7 @@ namespace CJCOR
                         }
                         else if (cmd == 5)
                         {
-                            int ff = (int)getnumwithoutstr();
+                            int ff = getnumwithoutstr();
                             while (ff-- > 0)
                             {
                                 outstr.Add((byte)ReadByte());
@@ -753,27 +759,33 @@ namespace CJCOR
                 long len = outstr.Count;
                 byte[] Len = { (byte)(len / 256 / 256 / 256), (byte)(len / 256 / 256 % 256), (byte)(len / 256 % 256), (byte)(len % 256) };
                 otp.Write(Len, 0, 4);
-                var arr = outstr.ToArray();
+                byte[] arr = outstr.ToArray();
                 otp.Write(arr, 0, arr.Length);
             }
             otp.Flush();
             Dispatcher.Invoke(new Action(() =>
             {
                 Progress.IsEnabled = true;
-                Progress.SetResourceReference(ContentControl.ContentProperty, "Start");
+                Progress.SetResourceReference(ContentProperty, "Start");
             }));
         }
         [STAThread]
         public void Begin()
         {
-            var open = new OpenFileDialog();
-            open.Filter = "Midi files (*.mid, *.midi)|*.mid; *.midi";
+            OpenFileDialog open = new OpenFileDialog
+            {
+                Filter = "Midi files (*.mid, *.midi)|*.mid; *.midi"
+            };
             if ((bool)open.ShowDialog())
             {
                 filein = open.FileName;
             }
-            else return;
-            var ext = System.IO.Path.GetExtension(filein);
+            else
+            {
+                return;
+            }
+
+            string ext = Path.GetExtension(filein);
             fileout = filein.Substring(0, filein.Length - ext.Length) + ".cjcor";
             bool res = false;
             Dispatcher.Invoke(new Action(() =>

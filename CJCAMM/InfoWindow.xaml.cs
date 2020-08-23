@@ -11,7 +11,7 @@ namespace CJC_Advanced_Midi_Merger
     /// </summary>
     public partial class InfoWindow : Window
     {
-        long nc = 0, tm = 0;
+        private long nc = 0, tm = 0;
         public InfoWindow()
         {
             InitializeComponent();
@@ -45,7 +45,7 @@ namespace CJC_Advanced_Midi_Merger
                 }
                 Dispatcher.Invoke(new Action(() =>
                 {
-                    progress.SetResourceReference(ContentControl.ContentProperty, "Parsingtrack");
+                    progress.SetResourceReference(ContentProperty, "Parsingtrack");
                     string str = (string)progress.Content;
                     str = str.Replace("{trackcount}", (trk + 1).ToString());
                     str = str.Replace("{tracksize}", len.ToString("N0"));
@@ -177,14 +177,16 @@ namespace CJC_Advanced_Midi_Merger
             {
                 notecnt.Text = nc.ToString("N0");
                 midilen.Text = tm.ToString("N0");
-                progress.SetResourceReference(ContentControl.ContentProperty, "Finished");
+                progress.SetResourceReference(ContentProperty, "Finished");
             }));
         }
         public void GetInfoClicked(object sender, RoutedEventArgs e)
         {
             progress.IsEnabled = false;
-            Thread th = new Thread(GetInfo);
-            th.IsBackground = true;
+            Thread th = new Thread(GetInfo)
+            {
+                IsBackground = true
+            };
             th.Start();
         }
         public void GetLessInfo(object sender, RoutedEventArgs e)
@@ -216,7 +218,7 @@ namespace CJC_Advanced_Midi_Merger
                 ppq = ppq * 256 + st.ReadByte();
                 trkcnt.Text = Convert.ToString(ppq);
                 progress.IsEnabled = false;
-                progress.SetResourceReference(ContentControl.ContentProperty, "UnableGroup");
+                progress.SetResourceReference(ContentProperty, "UnableGroup");
                 notecnt.Text = "";
                 midilen.Text = "";
             }

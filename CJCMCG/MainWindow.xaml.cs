@@ -24,7 +24,7 @@ namespace CJCMCG
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    struct pairli
+    internal struct pairli
     {
         public long x;
         public double y;
@@ -75,12 +75,13 @@ namespace CJCMCG
             }
         }
     }
-    struct pairls
+
+    internal struct pairls
     {
         public long x;
-        public String y;
+        public string y;
         public int trk, cnt;
-        public pairls(long a, String b, int c, int d)
+        public pairls(long a, string b, int c, int d)
         {
             x = a;
             y = b;
@@ -183,12 +184,15 @@ namespace CJCMCG
                 height.Value = 17280;
             }
         }
-        bool fileselected = false;
+
+        private bool fileselected = false;
         [STAThread]
         public void filename_Click(object sender, RoutedEventArgs e)
         {
-            var open = new OpenFileDialog();
-            open.Filter = "Midi files or zipped files (*.mid, *.cjcmcg, *.xz, *.7z, *.zip, *.gz, *.tar, *.rar)|*.mid; *.cjcmcg; *.xz; *.7z; *.zip; *.gz; *.tar; *.rar";
+            OpenFileDialog open = new OpenFileDialog
+            {
+                Filter = "Midi files or zipped files (*.mid, *.cjcmcg, *.xz, *.7z, *.zip, *.gz, *.tar, *.rar)|*.mid; *.cjcmcg; *.xz; *.7z; *.zip; *.gz; *.tar; *.rar"
+            };
             if ((bool)open.ShowDialog())
             {
                 filename.Content = open.FileName;
@@ -220,7 +224,7 @@ namespace CJCMCG
             pattt = pattt.Replace("\\10", "\n").Replace("\\23", "\\");
             pat.Text = pattt;
             long coll = (int)reg.GetValue("Color");
-            UInt32 col = Convert.ToUInt32(coll < 0 ? coll + (1L << 32) : coll);
+            uint col = Convert.ToUInt32(coll < 0 ? coll + (1L << 32) : coll);
             color.Background = new SolidColorBrush(System.Windows.Media.Color.FromArgb((byte)(col / 256 / 256 / 256), (byte)(col / 256 / 256 % 256), (byte)(col / 256 % 256), (byte)(col % 256)));
             bool isnew = false;
             for (int i = 0; i < oldList.Length - 2; i++)
@@ -269,12 +273,16 @@ namespace CJCMCG
         {
             try
             {
-                Process ffmpeg = new Process();
-                ffmpeg.StartInfo = new ProcessStartInfo("ffmpeg", "-h");
-                ffmpeg.StartInfo.RedirectStandardInput = false;
-                ffmpeg.StartInfo.CreateNoWindow = true;
-                ffmpeg.StartInfo.UseShellExecute = false;
-                ffmpeg.StartInfo.RedirectStandardError = false;
+                Process ffmpeg = new Process
+                {
+                    StartInfo = new ProcessStartInfo("ffmpeg", "-h")
+                    {
+                        RedirectStandardInput = false,
+                        CreateNoWindow = true,
+                        UseShellExecute = false,
+                        RedirectStandardError = false
+                    }
+                };
                 ffmpeg.Start();
             }
             catch (Exception)
@@ -284,12 +292,16 @@ namespace CJCMCG
             }
             try
             {
-                Process ffmpeg = new Process();
-                ffmpeg.StartInfo = new ProcessStartInfo("natsulang", "-h");
-                ffmpeg.StartInfo.RedirectStandardInput = false;
-                ffmpeg.StartInfo.CreateNoWindow = true;
-                ffmpeg.StartInfo.UseShellExecute = false;
-                ffmpeg.StartInfo.RedirectStandardError = false;
+                Process ffmpeg = new Process
+                {
+                    StartInfo = new ProcessStartInfo("natsulang", "-h")
+                    {
+                        RedirectStandardInput = false,
+                        CreateNoWindow = true,
+                        UseShellExecute = false,
+                        RedirectStandardError = false
+                    }
+                };
                 ffmpeg.Start();
             }
             catch (Exception)
@@ -300,9 +312,11 @@ namespace CJCMCG
             System.Drawing.Text.InstalledFontCollection fonts = new System.Drawing.Text.InstalledFontCollection();
             foreach (System.Drawing.FontFamily family in fonts.Families)
             {
-                ComboBoxItem cbb = new ComboBoxItem();
-                cbb.Content = family.Name;
-                cbb.Uid = family.Name;
+                ComboBoxItem cbb = new ComboBoxItem
+                {
+                    Content = family.Name,
+                    Uid = family.Name
+                };
                 font.Items.Add(cbb);
                 if (family.Name == "Consolas")
                 {
@@ -318,9 +332,11 @@ namespace CJCMCG
             string[] nm = reg.GetSubKeyNames();
             foreach (string s in nm)
             {
-                ComboBoxItem item = new ComboBoxItem();
-                item.Uid = s;
-                item.Content = s;
+                ComboBoxItem item = new ComboBoxItem
+                {
+                    Uid = s,
+                    Content = s
+                };
                 pats.Items.Add(item);
             }
         }
@@ -364,45 +380,55 @@ namespace CJCMCG
             string[] nm = reg.GetSubKeyNames();
             foreach (string s in nm)
             {
-                ComboBoxItem item = new ComboBoxItem();
-                item.Uid = s;
-                item.Content = s;
+                ComboBoxItem item = new ComboBoxItem
+                {
+                    Uid = s,
+                    Content = s
+                };
                 pats.Items.Add(item);
             }
         }
 
         public static string filein;
-        Process startNewSSFF(int W, int H, int F, string path)
+
+        private Process startNewSSFF(int W, int H, int F, string path)
         {
             Process ffmpeg = new Process();
             string args = "" +
                     /*" -s " + W.ToString() + "x" + H.ToString() + */" -y -vsync 2 -threads " + Environment.ProcessorCount.ToString() + " -r " + Convert.ToString(F)
                     + " -i - -vcodec png";
             args += " \"" + path + "\"";
-            ffmpeg.StartInfo = new ProcessStartInfo("ffmpeg", args);
-            ffmpeg.StartInfo.RedirectStandardInput = true;
-            ffmpeg.StartInfo.CreateNoWindow = true;
-            ffmpeg.StartInfo.UseShellExecute = false;
-            ffmpeg.StartInfo.RedirectStandardError = false;
+            ffmpeg.StartInfo = new ProcessStartInfo("ffmpeg", args)
+            {
+                RedirectStandardInput = true,
+                CreateNoWindow = true,
+                UseShellExecute = false,
+                RedirectStandardError = false
+            };
             ffmpeg.Start();
             return ffmpeg;
         }
-        Process ff;
-        static bool CanDec(string s)
+
+        private Process ff;
+
+        private static bool CanDec(string s)
         {
             return s.EndsWith(".mid") || s.EndsWith(".xz") || s.EndsWith(".zip") || s.EndsWith(".7z") || s.EndsWith(".rar") || s.EndsWith(".tar") || s.EndsWith(".gz") || s.EndsWith(".cjcmcg");
         }
-        static Stream AddXZLayer(Stream input)
+
+        private static Stream AddXZLayer(Stream input)
         {
             try
             {
-                Process xz = new Process();
-                xz.StartInfo = new ProcessStartInfo("xz", "-dc --threads=0")
+                Process xz = new Process
                 {
-                    RedirectStandardOutput = true,
-                    RedirectStandardInput = true,
-                    UseShellExecute = false,
-                    CreateNoWindow = true
+                    StartInfo = new ProcessStartInfo("xz", "-dc --threads=0")
+                    {
+                        RedirectStandardOutput = true,
+                        RedirectStandardInput = true,
+                        UseShellExecute = false,
+                        CreateNoWindow = true
+                    }
                 };
                 xz.Start();
                 Task.Run(() =>
@@ -418,10 +444,11 @@ namespace CJCMCG
                 return new XZStream(input);
             }
         }
-        static Stream AddZipLayer(Stream input)
+
+        private static Stream AddZipLayer(Stream input)
         {
-            var zip = new System.IO.Compression.ZipArchive(input, ZipArchiveMode.Read);
-            foreach (var entry in zip.Entries)
+            ZipArchive zip = new System.IO.Compression.ZipArchive(input, ZipArchiveMode.Read);
+            foreach (ZipArchiveEntry entry in zip.Entries)
             {
                 if (CanDec(entry.Name))
                 {
@@ -431,10 +458,11 @@ namespace CJCMCG
             }
             throw new Exception("No compatible file found in the .zip");
         }
-        static Stream AddRarLayer(Stream input)
+
+        private static Stream AddRarLayer(Stream input)
         {
-            var zip = RarArchive.Open(input);
-            foreach (var entry in zip.Entries)
+            RarArchive zip = RarArchive.Open(input);
+            foreach (RarArchiveEntry entry in zip.Entries)
             {
                 if (CanDec(entry.Key))
                 {
@@ -444,10 +472,11 @@ namespace CJCMCG
             }
             throw new Exception("No compatible file found in the .rar");
         }
-        static Stream Add7zLayer(Stream input)
+
+        private static Stream Add7zLayer(Stream input)
         {
-            var zip = SevenZipArchive.Open(input);
-            foreach (var entry in zip.Entries)
+            SevenZipArchive zip = SevenZipArchive.Open(input);
+            foreach (SevenZipArchiveEntry entry in zip.Entries)
             {
                 if (CanDec(entry.Key))
                 {
@@ -457,10 +486,11 @@ namespace CJCMCG
             }
             throw new Exception("No compatible file found in the .7z");
         }
-        static Stream AddTarLayer(Stream input)
+
+        private static Stream AddTarLayer(Stream input)
         {
-            var zip = TarArchive.Open(input);
-            foreach (var entry in zip.Entries)
+            TarArchive zip = TarArchive.Open(input);
+            foreach (TarArchiveEntry entry in zip.Entries)
             {
                 if (CanDec(entry.Key))
                 {
@@ -470,10 +500,11 @@ namespace CJCMCG
             }
             throw new Exception("No compatible file found in the .tar");
         }
-        static Stream AddGZLayer(Stream input)
+
+        private static Stream AddGZLayer(Stream input)
         {
-            var zip = GZipArchive.Open(input);
-            foreach (var entry in zip.Entries)
+            GZipArchive zip = GZipArchive.Open(input);
+            foreach (GZipArchiveEntry entry in zip.Entries)
             {
                 if (CanDec(entry.Key))
                 {
@@ -483,18 +514,21 @@ namespace CJCMCG
             }
             throw new Exception("No compatible file found in the .gz");
         }
-        static Process Natsulang()
+
+        private static Process Natsulang()
         {
             try
             {
-                Process ntl = new Process();
-                ntl.StartInfo = new ProcessStartInfo("natsulang", "-s")
+                Process ntl = new Process
                 {
-                    RedirectStandardOutput = true,
-                    RedirectStandardInput = true,
-                    RedirectStandardError = true,
-                    UseShellExecute = false,
-                    CreateNoWindow = true
+                    StartInfo = new ProcessStartInfo("natsulang", "-s")
+                    {
+                        RedirectStandardOutput = true,
+                        RedirectStandardInput = true,
+                        RedirectStandardError = true,
+                        UseShellExecute = false,
+                        CreateNoWindow = true
+                    }
                 };
                 ntl.Start();
                 return ntl;
@@ -505,24 +539,26 @@ namespace CJCMCG
                 throw new Exception("Natsulang not installed");
             }
         }
-        int toint(int x)
+
+        private int toint(int x)
         {
             return x < 0 ? x + 256 : x;
         }
-        string fonsel;
-        int fonsz;
-        SolidColorBrush colsel;
+
+        private string fonsel;
+        private int fonsz;
+        private SolidColorBrush colsel;
         public void newframe(int W, int H, string pat)
         {
-            using (var fon = new Font(fonsel, fonsz))
+            using (Font fon = new Font(fonsel, fonsz))
             {
-                var img = new Bitmap(W, H);
-                using (var gfx = Graphics.FromImage(img))
+                Bitmap img = new Bitmap(W, H);
+                using (Graphics gfx = Graphics.FromImage(img))
                 {
                     gfx.FillRectangle(System.Drawing.Brushes.Transparent, 0, 0, W, H);
                     Dispatcher.Invoke(new Action(() =>
                     {
-                        using (var textBrush = new SolidBrush(System.Drawing.Color.FromArgb(colsel.Color.A, colsel.Color.R, colsel.Color.G, colsel.Color.B)))
+                        using (SolidBrush textBrush = new SolidBrush(System.Drawing.Color.FromArgb(colsel.Color.A, colsel.Color.R, colsel.Color.G, colsel.Color.B)))
                         {
                             gfx.DrawString(pat, fon, textBrush, new PointF(0, 0));
                         }
@@ -535,9 +571,10 @@ namespace CJCMCG
                 img.Dispose();
             }
         }
-        int resol;
-        string patt;
-        public string getstring(long nc, long an, double bp, double tm, long np, long po, long ti, long at, long frm, String lrcs = "", long lrc_frm = 0)
+
+        private int resol;
+        private string patt;
+        public string getstring(long nc, long an, double bp, double tm, long np, long po, long ti, long at, long frm, string lrcs = "", long lrc_frm = 0)
         {
             string ss = "{nc={0};an={1};bpm={2};tm={3};nps={4};pol={5};tic={6};ati={7};bts={8};abt={9};ppq={A};lrc=\"\"\"{B}\"\"\";frm={C};lrc_frm={D};}";
             ss = ss.Replace("{0}", Convert.ToString(nc));
@@ -606,8 +643,10 @@ namespace CJCMCG
                 return;
             }
             string fileout = "";
-            SaveFileDialog getFileout = new SaveFileDialog();
-            getFileout.Filter = "MOV files (*.mov)|*.mov";
+            SaveFileDialog getFileout = new SaveFileDialog
+            {
+                Filter = "MOV files (*.mov)|*.mov"
+            };
             if ((bool)getFileout.ShowDialog())
             {
                 fileout = getFileout.FileName;
@@ -662,7 +701,11 @@ namespace CJCMCG
             int ReadByte()
             {
                 int b = inpp.ReadByte();
-                if (b == -1) throw new Exception("Unexpected file end");
+                if (b == -1)
+                {
+                    throw new Exception("Unexpected file end");
+                }
+
                 return b;
             }
             ArrayList nts = new ArrayList(), nto = new ArrayList();
@@ -851,7 +894,7 @@ namespace CJCMCG
                                 Encoding gb2312 = Encoding.GetEncoding("GBK");
                                 Encoding def = Encoding.GetEncoding("UTF-8");
                                 lrccnt++;
-                                int ff = (int)getnum();
+                                int ff = getnum();
                                 byte[] S = new byte[ff];
                                 int cnt = 0;
                                 while (ff-- > 0)
@@ -893,7 +936,7 @@ namespace CJCMCG
                 }
                 Dispatcher.Invoke(new Action(() =>
                 {
-                    prog.SetResourceReference(ContentControl.ContentProperty, "ReadFinished");
+                    prog.SetResourceReference(ContentProperty, "ReadFinished");
                     string str = (string)prog.Content;
                     str = str.Replace("{notecnt}", noteall.ToString("N0"));
                     prog.Content = str;
@@ -940,7 +983,10 @@ namespace CJCMCG
                     Siz = Siz * 256 + toint(ReadByte());
                     List<byte> arr = new List<byte>();
                     for (int j = 0; j < Siz; j++)
+                    {
                         arr.Add((byte)ReadByte());
+                    }
+
                     lrcs.Add(new pairls(Tm, Encoding.UTF8.GetString(arr.ToArray()), 0, i));
                 }
                 noteall = getNum();
@@ -977,11 +1023,11 @@ namespace CJCMCG
                     byteArray.Add((byte)ch);
                     ch = natsu.StandardOutput.BaseStream.ReadByte();
                 }
-                s = System.Text.Encoding.Default.GetString(byteArray.ToArray());
+                s = Encoding.Default.GetString(byteArray.ToArray());
                 newframe(W, H, s);
                 Dispatcher.Invoke(new Action(() =>
                 {
-                    prog.SetResourceReference(ContentControl.ContentProperty, "FrameRender");
+                    prog.SetResourceReference(ContentProperty, "FrameRender");
                     string str = (string)prog.Content;
                     str = str.Replace("{frames}", tmdf.ToString());
                     prog.Content = str;
@@ -1044,12 +1090,12 @@ namespace CJCMCG
                     byteArray.Add((byte)ch);
                     ch = natsu.StandardOutput.BaseStream.ReadByte();
                 }
-                s = System.Text.Encoding.Default.GetString(byteArray.ToArray());
+                s = Encoding.Default.GetString(byteArray.ToArray());
                 newframe(W, H, s);
                 history[tmdf % F] = notecnt;
                 Dispatcher.Invoke(new Action(() =>
                 {
-                    prog.SetResourceReference(ContentControl.ContentProperty, "FrameRender");
+                    prog.SetResourceReference(ContentProperty, "FrameRender");
                     string str = (string)prog.Content;
                     str = str.Replace("{frames}", tmdf.ToString());
                     prog.Content = str;
@@ -1076,11 +1122,11 @@ namespace CJCMCG
                     byteArray.Add((byte)ch);
                     ch = natsu.StandardOutput.BaseStream.ReadByte();
                 }
-                s = System.Text.Encoding.Default.GetString(byteArray.ToArray());
+                s = Encoding.Default.GetString(byteArray.ToArray());
                 newframe(W, H, s);
                 Dispatcher.Invoke(new Action(() =>
                 {
-                    prog.SetResourceReference(ContentControl.ContentProperty, "FrameRender");
+                    prog.SetResourceReference(ContentProperty, "FrameRender");
                     string str = (string)prog.Content;
                     str = str.Replace("{frames}", tmdf.ToString());
                     prog.Content = str;
@@ -1091,7 +1137,7 @@ namespace CJCMCG
             }
             Dispatcher.Invoke(new Action(() =>
             {
-                prog.SetResourceReference(ContentControl.ContentProperty, "Finished");
+                prog.SetResourceReference(ContentProperty, "Finished");
                 preview.Text = "";
             }));
             ff.StandardInput.Close();

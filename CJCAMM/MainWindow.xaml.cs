@@ -37,20 +37,27 @@ namespace CJC_Advanced_Midi_Merger
         public static int defppq;
         public void AddMidi(object sender, RoutedEventArgs e)
         {
-            var open = new OpenFileDialog();
-            open.Filter = "Midi files and groups (*.mid, *.midi, *.cjcamm)|*.mid; *.midi; *.cjcamm";
-            open.Multiselect = true;
+            OpenFileDialog open = new OpenFileDialog
+            {
+                Filter = "Midi files and groups (*.mid, *.midi, *.cjcamm)|*.mid; *.midi; *.cjcamm",
+                Multiselect = true
+            };
             if ((bool)open.ShowDialog())
             {
                 foreach (string i in open.FileNames)
                 {
-                    ListBoxItem itm = new ListBoxItem();
-                    itm.Content = i;
-                    itm.DataContext = new Sts();
+                    ListBoxItem itm = new ListBoxItem
+                    {
+                        Content = i,
+                        DataContext = new Sts()
+                    };
                     MidisAdded.Items.Add(itm);
                 }
             }
-            else return;
+            else
+            {
+                return;
+            }
         }
         public void RemoveMidi(object sender, RoutedEventArgs e)
         {
@@ -72,13 +79,17 @@ namespace CJC_Advanced_Midi_Merger
             {
                 return;
             }
-            SettingsWindow stss = new SettingsWindow((Sts)((ListBoxItem)MidisAdded.SelectedItem).DataContext);
-            stss.ShowInTaskbar = false;
-            stss.Owner = this;
+            SettingsWindow stss = new SettingsWindow((Sts)((ListBoxItem)MidisAdded.SelectedItem).DataContext)
+            {
+                ShowInTaskbar = false,
+                Owner = this
+            };
             stss.ShowDialog();
-            ListBoxItem itm = new ListBoxItem();
-            itm.Content = ((ListBoxItem)MidisAdded.SelectedItem).Content;
-            itm.DataContext = stss.stt;
+            ListBoxItem itm = new ListBoxItem
+            {
+                Content = ((ListBoxItem)MidisAdded.SelectedItem).Content,
+                DataContext = stss.stt
+            };
             MidisAdded.SelectedItem = itm;
         }
         public void GetInfo(object sender, RoutedEventArgs w)
@@ -96,10 +107,12 @@ namespace CJC_Advanced_Midi_Merger
         [STAThread]
         public void SaveGroup(object sender, RoutedEventArgs w)
         {
-            Groups grp = new Groups();
-            grp.ms = new List<Groups>();
-            grp.file = ".cjcamm";
-            grp.st = new Sts();
+            Groups grp = new Groups
+            {
+                ms = new List<Groups>(),
+                file = ".cjcamm",
+                st = new Sts()
+            };
             try
             {
                 for (int i = 0; i < MidisAdded.Items.Count; i++)
@@ -127,8 +140,10 @@ namespace CJC_Advanced_Midi_Merger
             {
                 return;
             }
-            var save = new SaveFileDialog();
-            save.Filter = "CJCAMM group files (*.cjcamm)|*.cjcamm";
+            SaveFileDialog save = new SaveFileDialog
+            {
+                Filter = "CJCAMM group files (*.cjcamm)|*.cjcamm"
+            };
             if ((bool)save.ShowDialog())
             {
                 output = save.FileName;
@@ -145,20 +160,22 @@ namespace CJC_Advanced_Midi_Merger
                 Head[i] = (byte)head[i];
             }
             gro.Write(Head, 0, 12);
-            List<byte> go = new List<byte>();
-            go.Add((byte)(Convert.ToInt32(sfg.ppq.Value) / 256));
-            go.Add((byte)(Convert.ToInt32(sfg.ppq.Value) % 256));
-            go.Add((byte)0);
-            go.Add((byte)1);
+            List<byte> go = new List<byte>
+            {
+                (byte)(Convert.ToInt32(sfg.ppq.Value) / 256),
+                (byte)(Convert.ToInt32(sfg.ppq.Value) % 256),
+                0,
+                1
+            };
             for (int i = 0; i < MidisAdded.Items.Count; i++)
             {
                 string file = (string)((ListBoxItem)MidisAdded.Items[i]).Content;
                 byte[] arr = Encoding.UTF8.GetBytes(file);
                 for (int j = 0; j < arr.Length; j++)
                 {
-                    go.Add((byte)arr[j]);
+                    go.Add(arr[j]);
                 }
-                go.Add((byte)0);
+                go.Add(0);
                 Sts st = (Sts)((ListBoxItem)MidisAdded.Items[i]).DataContext;
                 if (st.offst > 0)
                 {
@@ -201,7 +218,7 @@ namespace CJC_Advanced_Midi_Merger
                 {
                     go.Add((byte)'C');
                 }
-                go.Add((byte)0);
+                go.Add(0);
             }
             gro.Write(go.ToArray(), 0, go.Count);
             gro.Close();
@@ -210,8 +227,10 @@ namespace CJC_Advanced_Midi_Merger
         public void LoadGroup(object sender, RoutedEventArgs e)
         {
             string infile;
-            var sfg = new OpenFileDialog();
-            sfg.Filter = "CJCAMM group files (*.cjcamm)|*.cjcamm";
+            OpenFileDialog sfg = new OpenFileDialog
+            {
+                Filter = "CJCAMM group files (*.cjcamm)|*.cjcamm"
+            };
             if ((bool)sfg.ShowDialog())
             {
                 infile = sfg.FileName;
@@ -259,8 +278,10 @@ namespace CJC_Advanced_Midi_Merger
                 {
                     break;
                 }
-                ListBoxItem itm = new ListBoxItem();
-                itm.Content = filename;
+                ListBoxItem itm = new ListBoxItem
+                {
+                    Content = filename
+                };
                 Sts st = new Sts();
                 while ((ch = gro.ReadByte()) != 0)
                 {
@@ -343,9 +364,11 @@ namespace CJC_Advanced_Midi_Merger
                 throw new Exception();
             }
             Stream ins = File.Open(filename, FileMode.Open, FileAccess.Read, FileShare.Read);
-            Groups grp = new Groups();
-            grp.ms = new List<Groups>();
-            grp.file = filename;
+            Groups grp = new Groups
+            {
+                ms = new List<Groups>(),
+                file = filename
+            };
             if (!filename.EndsWith(".cjcamm"))
             {
                 for (int i = 0; i < 12; i++)
@@ -459,10 +482,12 @@ namespace CJC_Advanced_Midi_Merger
 
         public void StartRender(object sender, RoutedEventArgs e)
         {
-            Groups grp = new Groups();
-            grp.ms = new List<Groups>();
-            grp.file = ".cjcamm";
-            grp.st = new Sts();
+            Groups grp = new Groups
+            {
+                ms = new List<Groups>(),
+                file = ".cjcamm",
+                st = new Sts()
+            };
             try
             {
                 for (int i = 0; i < MidisAdded.Items.Count; i++)
@@ -491,8 +516,10 @@ namespace CJC_Advanced_Midi_Merger
             {
                 return;
             }
-            var save = new SaveFileDialog();
-            save.Filter = "MIDI files (*.mid)|*.mid";
+            SaveFileDialog save = new SaveFileDialog
+            {
+                Filter = "MIDI files (*.mid)|*.mid"
+            };
             if ((bool)save.ShowDialog())
             {
                 output = save.FileName;
@@ -503,11 +530,15 @@ namespace CJC_Advanced_Midi_Merger
             }
             try
             {
-                RenderWindow rw = new RenderWindow(grp, output);
-                rw.ShowInTaskbar = false;
-                rw.Owner = this;
-                Thread th = new Thread(rw.StartMerge);
-                th.IsBackground = true;
+                RenderWindow rw = new RenderWindow(grp, output)
+                {
+                    ShowInTaskbar = false,
+                    Owner = this
+                };
+                Thread th = new Thread(rw.StartMerge)
+                {
+                    IsBackground = true
+                };
                 th.Start();
                 rw.ShowDialog();
             }
@@ -562,9 +593,11 @@ namespace CJC_Advanced_Midi_Merger
                 {
                     return;
                 }
-                ListBoxItem it = new ListBoxItem();
-                it.Content = s;
-                it.DataContext = new Sts();
+                ListBoxItem it = new ListBoxItem
+                {
+                    Content = s,
+                    DataContext = new Sts()
+                };
                 MidisAdded.Items.Add(it);
             }
         }
