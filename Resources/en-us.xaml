@@ -11,6 +11,7 @@
     <s:String x:Key="SaveGroup">Save Group</s:String>
     <s:String x:Key="LoadGroup">Load Group</s:String>
     <s:String x:Key="Start">Start!</s:String>
+    <s:String x:Key="Cancel">Cancel</s:String>
     <s:String x:Key="Save">Save!</s:String>
     <s:String x:Key="StartWindowtitle">Start Merge</s:String>
     <s:String x:Key="InfoWindowtitle">Midi Information</s:String>
@@ -35,6 +36,8 @@
     <s:String x:Key="Midilen">Midi length (ticks):&#160;</s:String>
     <s:String x:Key="Getmoreinfo">Get more information</s:String>
     <s:String x:Key="Finished">Finished.</s:String>
+    <s:String x:Key="Failed">Failed.</s:String>
+    <s:String x:Key="Stopped">Stopped.</s:String>
     <s:String x:Key="Parsingtrack">Parsing track {trackcount}, {tracksize} bytes</s:String>
     <s:String x:Key="UnableGroup">Unable to get more information on group files</s:String>
     <s:String x:Key="Clickgetinfo">(Click "Get more information" below to get)</s:String>
@@ -51,7 +54,7 @@
     <s:String x:Key="Prereading">Prereading track {trackcount}</s:String>
     <s:String x:Key="SuccessfullyOutput" xml:space="preserve">Successfully outputted file to&#32;</s:String>
     <s:String x:Key="CJCMCGtitle">Conjac Jelly Charlieyan's Midi Counter Generator</s:String>
-    <s:String x:Key="CJCMCGInfo" xml:space="preserve">Conjac Jelly Charlieyan's Midi Counter Generator&#10;A software used to generate a counter of a MIDI.&#10;Made by HuaChaoChaoDaYe and Shuangsheng Blackfans Club.</s:String>
+    <s:String x:Key="CJCMCGInfo" xml:space="preserve">Conjac Jelly Charlieyan's Midi Counter Generator&#10;The representative work of CJC Apps. A software used to generate a counter of a MIDI.&#10;Made by HuaChaoChaoDaYe and Shuangsheng Blackfans Club.</s:String>
     <s:String x:Key="SelectFile">Select File</s:String>
     <s:String x:Key="Width">Width</s:String>
     <s:String x:Key="Height">Height</s:String>

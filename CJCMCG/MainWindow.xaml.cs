@@ -4,6 +4,7 @@ using SharpCompress.Archives.Rar;
 using SharpCompress.Archives.SevenZip;
 using SharpCompress.Archives.Tar;
 using SharpCompress.Compressors.Xz;
+using SharpCompress.Compressors.BZip2;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -143,6 +144,11 @@ namespace CJCMCG
                 width.Value = 1080;
                 height.Value = 320;
             }
+            else if (((ComboBoxItem)pres.SelectedItem).Uid == "360P")
+            {
+                width.Value = 640;
+                height.Value = 360;
+            }
             else if (((ComboBoxItem)pres.SelectedItem).Uid == "720P")
             {
                 width.Value = 1280;
@@ -191,7 +197,7 @@ namespace CJCMCG
         {
             OpenFileDialog open = new OpenFileDialog
             {
-                Filter = "Midi files or zipped files (*.mid, *.cjcmcg, *.xz, *.7z, *.zip, *.gz, *.tar, *.rar)|*.mid; *.cjcmcg; *.xz; *.7z; *.zip; *.gz; *.tar; *.rar"
+                Filter = "Midi files or zipped files (*.mid, *.cjcmcg, *.xz, *.7z, *.zip, *.gz, *.tar, *.rar, *.bz2)|*.mid; *.cjcmcg; *.xz; *.7z; *.zip; *.gz; *.tar; *.rar; *.bz2"
             };
             if ((bool)open.ShowDialog())
             {
@@ -413,7 +419,7 @@ namespace CJCMCG
 
         private static bool CanDec(string s)
         {
-            return s.EndsWith(".mid") || s.EndsWith(".xz") || s.EndsWith(".zip") || s.EndsWith(".7z") || s.EndsWith(".rar") || s.EndsWith(".tar") || s.EndsWith(".gz") || s.EndsWith(".cjcmcg");
+            return s.EndsWith(".mid") || s.EndsWith(".xz") || s.EndsWith(".zip") || s.EndsWith(".7z") || s.EndsWith(".rar") || s.EndsWith(".tar") || s.EndsWith(".gz") || s.EndsWith(".cjcmcg") || s.EndsWith(".bz2");
         }
 
         private static Stream AddXZLayer(Stream input)
@@ -515,6 +521,11 @@ namespace CJCMCG
             throw new Exception("No compatible file found in the .gz");
         }
 
+        private static Stream AddBZ2Layer(Stream input)
+        {
+            return new BZip2Stream(input, SharpCompress.Compressors.CompressionMode.Decompress, true);
+        }
+
         private static Process Natsulang()
         {
             try
@@ -528,6 +539,14 @@ namespace CJCMCG
                         RedirectStandardError = true,
                         UseShellExecute = false,
                         CreateNoWindow = true
+                    }
+                };
+                ntl.Exited += (s, e) =>
+                {
+                    if (((Process)s).ExitCode != 0)
+                    {
+                        string stderr = ((Process)s).StandardError.ReadToEnd();
+                        throw new Exception(stderr);
                     }
                 };
                 ntl.Start();
@@ -633,527 +652,599 @@ namespace CJCMCG
         }
         public void progress()
         {
-            if (!fileselected)
+            try
             {
+                if (!fileselected)
+                {
+                    Dispatcher.Invoke(new Action(() =>
+                    {
+                        filename.IsEnabled = true;
+                        prog.IsEnabled = true;
+                        Piliang.IsEnabled = true;
+                        canc.IsEnabled = false;
+                        width.IsEnabled = true;
+                        height.IsEnabled = true;
+                        fps.IsEnabled = true;
+                        pres.IsEnabled = true;
+                        des.IsEnabled = true;
+                    }));
+                    return;
+                }
+                string fileout = "";
+                SaveFileDialog getFileout = new SaveFileDialog
+                {
+                    Filter = "MOV files (*.mov)|*.mov"
+                };
+                if ((bool)getFileout.ShowDialog())
+                {
+                    fileout = getFileout.FileName;
+                }
+                else
+                {
+                    return;
+                }
+                Dispatcher.Invoke(new Action(() =>
+                {
+                    patt = pat.Text;
+                    fonsel = (string)((ComboBoxItem)font.SelectedItem).Content;
+                    fonsz = (int)fsize.Value;
+                    colsel = ((SolidColorBrush)color.Background);
+                }));
+                int W = 0, H = 0, F = 0, desv = 0;
+                Dispatcher.Invoke(new Action(() =>
+                {
+                    W = (int)width.Value; H = (int)height.Value; F = (int)fps.Value;
+                    desv = (int)des.Value;
+                }));
+                Stream inppp = File.Open(filein, FileMode.Open, FileAccess.Read, FileShare.Read);
+                while (!filein.EndsWith(".mid") && !filein.EndsWith(".cjcmcg"))
+                {
+                    if (filein.EndsWith(".xz"))
+                    {
+                        inppp = AddXZLayer(inppp);
+                        filein = filein.Substring(0, filein.Length - 3);
+                    }
+                    else if (filein.EndsWith(".zip"))
+                    {
+                        inppp = AddZipLayer(inppp);
+                    }
+                    else if (filein.EndsWith(".rar"))
+                    {
+                        inppp = AddRarLayer(inppp);
+                    }
+                    else if (filein.EndsWith(".7z"))
+                    {
+                        inppp = Add7zLayer(inppp);
+                    }
+                    else if (filein.EndsWith(".tar"))
+                    {
+                        inppp = AddTarLayer(inppp);
+                    }
+                    else if (filein.EndsWith(".gz"))
+                    {
+                        inppp = AddGZLayer(inppp);
+                    }
+                    else if (filein.EndsWith(".bz2"))
+                    {
+                        inppp = AddBZ2Layer(inppp);
+                    }
+                }
+                BufferedStream inpp = new BufferedStream(inppp, 16777216);
+                int ReadByte()
+                {
+                    int b = inpp.ReadByte();
+                    if (b == -1)
+                    {
+                        throw new Exception("Unexpected file end");
+                    }
+
+                    return b;
+                }
+                ArrayList nts = new ArrayList(), nto = new ArrayList();
+                ArrayList lrcs = new ArrayList();
+                ArrayList bpm = new ArrayList();
+                bool isPre = filein.EndsWith(".cjcmcg");
+                long noteall = 0;
+                int alltic = 0;
+                if (!isPre)
+                {
+                    for (int i = 0; i < 4; ++i)
+                    {
+                        ReadByte();
+                    }
+                    for (int i = 0; i < 4; ++i)
+                    {
+                        ReadByte();
+                    }
+                    ReadByte();
+                    ReadByte();
+                    int trkcnt;
+                    trkcnt = (toint(ReadByte()) * 256) + toint(ReadByte());
+                    resol = (toint(ReadByte()) * 256) + toint(ReadByte());
+                    bpm.Add(new pairli(0, 5000000000.0 / resol, -1, 0));
+                    int nowtrk = 1;
+                    int allticreal = 0;
+                    lrcs.Add(new pairls(0, "", -1, -1));
+                    for (int trk = 0; trk < trkcnt; trk++)
+                    {
+                        int bpmcnt = 0;
+                        int lrccnt = 0;
+                        long notes = 0;
+                        long leng = 0;
+                        ReadByte();
+                        ReadByte();
+                        ReadByte();
+                        ReadByte();
+                        for (int i = 0; i < 4; i++)
+                        {
+                            leng = leng * 256 + toint(ReadByte());
+                        }
+                        int lstcmd = 256;
+                        Dispatcher.Invoke(new Action(() =>
+                        {
+                            string str = prog.Uid;
+                            str = str.Replace("{trackcount}", (trk + 1).ToString() + "/" + trkcnt.ToString()).Replace("{tracksize}", leng.ToString("N0"));
+                            prog.Content = str;
+                        }));
+                        int getnum()
+                        {
+                            int ans = 0;
+                            int ch = 256;
+                            while (ch >= 128)
+                            {
+                                ch = toint(ReadByte());
+                                leng--;
+                                ans = ans * 128 + (ch & 0b01111111);
+                            }
+                            return ans;
+                        }
+                        int get()
+                        {
+                            if (lstcmd != 256)
+                            {
+                                int lstcmd2 = lstcmd;
+                                lstcmd = 256;
+                                return lstcmd2;
+                            }
+                            leng--;
+                            return toint(ReadByte());
+                        }
+                        int TM = 0;
+                        int prvcmd = 256;
+                        while (true)
+                        {
+                            int added = getnum();
+                            TM += added;
+                            int cmd = ReadByte();
+                            leng--;
+                            if (cmd < 128)
+                            {
+                                lstcmd = cmd;
+                                cmd = prvcmd;
+                            }
+                            prvcmd = cmd;
+                            int cm = cmd & 0b11110000;
+                            if (cm == 0b10010000)
+                            {
+                                get();
+                                ReadByte();
+                                leng--;
+                                while (nts.Count <= TM)
+                                {
+                                    nts.Add(0L);
+                                }
+                                while (nto.Count <= TM)
+                                {
+                                    nto.Add(0L);
+                                }
+                                nts[TM] = (Convert.ToInt64(nts[TM]) + 1L);
+                                notes++;
+                            }
+                            else if (cm == 0b10000000)
+                            {
+                                get();
+                                ReadByte();
+                                leng--;
+                                while (nts.Count <= TM)
+                                {
+                                    nts.Add(0L);
+                                }
+                                while (nto.Count <= TM)
+                                {
+                                    nto.Add(0L);
+                                }
+                                nto[TM] = (Convert.ToInt64(nto[TM]) + 1L);
+                            }
+                            else if (cm == 0b11000000 || cm == 0b11010000 || cmd == 0b11110011)
+                            {
+                                get();
+                            }
+                            else if (cm == 0b11100000 || cm == 0b10110000 || cmd == 0b11110010 || cm == 0b10100000)
+                            {
+                                get();
+                                ReadByte();
+                                leng--;
+                            }
+                            else if (cmd == 0b11110000)
+                            {
+                                if (get() == 0b11110111)
+                                {
+                                    continue;
+                                }
+                                do
+                                {
+                                    leng--;
+                                } while (ReadByte() != 0b11110111);
+                            }
+                            else if (cmd == 0b11110100 || cmd == 0b11110001 || cmd == 0b11110101 || cmd == 0b11111001 || cmd == 0b11111101 || cmd == 0b11110110 || cmd == 0b11110111 || cmd == 0b11111000 || cmd == 0b11111010 || cmd == 0b11111100 || cmd == 0b11111110)
+                            {
+                            }
+                            else if (cmd == 0b11111111)
+                            {
+                                cmd = get();
+                                if (cmd == 0)
+                                {
+                                    ReadByte(); ReadByte(); ReadByte();
+                                    leng -= 3;
+                                }
+                                else if (cmd >= 1 && cmd <= 10 && cmd != 5 || cmd == 0x7f)
+                                {
+                                    long ff = getnum();
+                                    while (ff-- > 0)
+                                    {
+                                        ReadByte();
+                                        leng--;
+                                    }
+                                }
+                                else if (cmd == 0x20 || cmd == 0x21)
+                                {
+                                    ReadByte(); ReadByte(); leng -= 2;
+                                }
+                                else if (cmd == 0x2f)
+                                {
+                                    ReadByte();
+                                    leng--;
+                                    if (TM > allticreal)
+                                    {
+                                        allticreal = TM;
+                                    }
+                                    TM -= added;
+                                    break;
+                                }
+                                else if (cmd == 0x51)
+                                {
+                                    bpmcnt++;
+                                    ReadByte();
+                                    leng--;
+                                    int BPM = get();
+                                    BPM = BPM * 256 + get();
+                                    BPM = BPM * 256 + get();
+                                    bpm.Add(new pairli(TM, 10000.0 * BPM / resol, trk, bpmcnt));
+                                }
+                                else if (cmd == 5)
+                                {
+                                    Encoding gb2312 = Encoding.GetEncoding("GBK");
+                                    Encoding def = Encoding.GetEncoding("UTF-8");
+                                    lrccnt++;
+                                    int ff = getnum();
+                                    byte[] S = new byte[ff];
+                                    int cnt = 0;
+                                    while (ff-- > 0)
+                                    {
+                                        S[cnt++] = Convert.ToByte(ReadByte());
+                                        leng--;
+                                    }
+                                    S = Encoding.Convert(gb2312, def, S);
+                                    lrcs.Add(new pairls(TM, def.GetString(S), trk, lrccnt));
+                                }
+                                else if (cmd == 0x54 || cmd == 0x58)
+                                {
+                                    ReadByte(); ReadByte(); ReadByte(); ReadByte(); ReadByte();
+                                    leng -= 5;
+                                }
+                                else if (cmd == 0x59)
+                                {
+                                    ReadByte(); ReadByte(); ReadByte();
+                                    leng -= 3;
+                                }
+                                else if (cmd == 0x0a)
+                                {
+                                    int ss = get();
+                                    while (ss-- > 0)
+                                    {
+                                        ReadByte();
+                                        leng--;
+                                    }
+                                }
+                            }
+                        }
+                        while (leng > 0)
+                        {
+                            ReadByte();
+                            leng--;
+                        }
+                        noteall += notes;
+                        nowtrk++;
+                    }
+                    Dispatcher.Invoke(new Action(() =>
+                    {
+                        prog.SetResourceReference(ContentProperty, "ReadFinished");
+                        string str = (string)prog.Content;
+                        str = str.Replace("{notecnt}", noteall.ToString("N0"));
+                        prog.Content = str;
+                    }));
+                    alltic = nto.Count;
+                }
+                else
+                {
+                    resol = 0;
+                    for (int i = 0; i < 4; i++)
+                    {
+                        resol = resol * 256 + toint(ReadByte());
+                    }
+                    int bpmcnt = 0;
+                    for (int i = 0; i < 4; i++)
+                    {
+                        bpmcnt = bpmcnt * 256 + toint(ReadByte());
+                    }
+                    for (int i = 0; i < bpmcnt; i++)
+                    {
+                        int Tm = toint(ReadByte());
+                        Tm = Tm * 256 + toint(ReadByte());
+                        Tm = Tm * 256 + toint(ReadByte());
+                        Tm = Tm * 256 + toint(ReadByte());
+                        int BPM = toint(ReadByte());
+                        BPM = BPM * 256 + toint(ReadByte());
+                        BPM = BPM * 256 + toint(ReadByte());
+                        bpm.Add(new pairli(Tm, 10000.0 * BPM / resol, 0, i));
+                    }
+                    int lrccnt = 0;
+                    for (int i = 0; i < 4; i++)
+                    {
+                        lrccnt = lrccnt * 256 + toint(ReadByte());
+                    }
+                    for (int i = 0; i < lrccnt; i++)
+                    {
+                        int Tm = toint(ReadByte());
+                        Tm = Tm * 256 + toint(ReadByte());
+                        Tm = Tm * 256 + toint(ReadByte());
+                        Tm = Tm * 256 + toint(ReadByte());
+                        int Siz = toint(ReadByte());
+                        Siz = Siz * 256 + toint(ReadByte());
+                        Siz = Siz * 256 + toint(ReadByte());
+                        Siz = Siz * 256 + toint(ReadByte());
+                        List<byte> arr = new List<byte>();
+                        for (int j = 0; j < Siz; j++)
+                        {
+                            arr.Add((byte)ReadByte());
+                        }
+
+                        lrcs.Add(new pairls(Tm, Encoding.UTF8.GetString(arr.ToArray()), 0, i));
+                    }
+                    noteall = getNum();
+                    alltic = 0;
+                    for (int i = 0; i < 4; i++)
+                    {
+                        alltic = alltic * 256 + toint(ReadByte());
+                    }
+                }
+                bpm.Sort(new AhhShitPairliCompare());
+                lrcs.Sort(new AhhShitPairlsCompare());
+                double[] tmc = new double[bpm.Count];
+                tmc[0] = 0;
+                for (int i = 1; i < bpm.Count; i++)
+                {
+                    tmc[i] = tmc[i - 1] + (((pairli)bpm[i]).x - ((pairli)bpm[i - 1]).x) * ((pairli)bpm[i - 1]).y / 10000.0;
+                }
+                Process natsu = Natsulang();
+                if (natsu == null)
+                {
+                    return;
+                }
+                ff = startNewSSFF(W, H, F, fileout);
+                int tmdf = 0;
+                for (int i = 0; i < F * desv; i++)
+                {
+                    string s = getstring(0, noteall, 120, 0, 0, 0, 0, alltic, tmdf) + patt + "{'\\0'}";
+                    natsu.StandardInput.Write(s);
+                    natsu.StandardInput.Flush();
+                    List<byte> byteArray = new List<byte>();
+                    int ch = natsu.StandardOutput.BaseStream.ReadByte();
+                    while (ch != 0)
+                    {
+                        byteArray.Add((byte)ch);
+                        ch = natsu.StandardOutput.BaseStream.ReadByte();
+                    }
+                    s = Encoding.Default.GetString(byteArray.ToArray());
+                    newframe(W, H, s);
+                    Dispatcher.Invoke(new Action(() =>
+                    {
+                        prog.SetResourceReference(ContentProperty, "FrameRender");
+                        string str = (string)prog.Content;
+                        str = str.Replace("{frames}", tmdf.ToString());
+                        prog.Content = str;
+                        preview.Text = s;
+                    }));
+                    tmdf++;
+                }
+                long tmnow = 0;
+                long[] history = new long[F];
+                long poly = 0;
+                int now = 0;
+                long notecnt = 0;
+                int tmm = 0, nowlrc = 0, bpmptr = 0;
+                long lrcf = 0;
+                long getNum()
+                {
+                    long ans = 0;
+                    int ch = 256;
+                    while (ch >= 128)
+                    {
+                        ch = toint(ReadByte());
+                        ans = ans * 128 + (ch & 0b01111111);
+                    }
+                    return ans;
+                }
+                while (now < alltic || poly > 0)
+                {
+                    for (; now <= tmm; now++)
+                    {
+                        if (now >= alltic)
+                        {
+                            break;
+                        }
+                        if (isPre)
+                        {
+                            long jar = getNum();
+                            notecnt += jar;
+                            poly += jar;
+                            poly -= getNum();
+                        }
+                        else
+                        {
+                            notecnt += Convert.ToInt64(nts[now]);
+                            poly += Convert.ToInt64(nts[now]);
+                            poly -= Convert.ToInt64(nto[now]);
+                        }
+                    }
+                    while (nowlrc < lrcs.Count - 1 && ((pairls)lrcs[nowlrc + 1]).x <= tmm)
+                    {
+                        nowlrc++;
+                        lrcf = 0;
+                    }
+                    string s = getstring(notecnt, noteall, 600000000000.0 / resol / ((pairli)bpm[bpmptr]).y, 1.0 * (tmdf - F * desv) / F, notecnt - history[tmdf % F], poly, tmm > alltic ? alltic : Convert.ToInt64(tmm), alltic, tmdf, ((pairls)lrcs[nowlrc]).y, lrcf) + patt + "{'\\0'}";
+                    natsu.StandardInput.Write(s);
+                    natsu.StandardInput.Flush();
+                    List<byte> byteArray = new List<byte>();
+                    int ch = natsu.StandardOutput.BaseStream.ReadByte();
+                    while (ch != 0)
+                    {
+                        byteArray.Add((byte)ch);
+                        ch = natsu.StandardOutput.BaseStream.ReadByte();
+                    }
+                    s = Encoding.Default.GetString(byteArray.ToArray());
+                    newframe(W, H, s);
+                    history[tmdf % F] = notecnt;
+                    Dispatcher.Invoke(new Action(() =>
+                    {
+                        prog.SetResourceReference(ContentProperty, "FrameRender");
+                        string str = (string)prog.Content;
+                        str = str.Replace("{frames}", tmdf.ToString());
+                        prog.Content = str;
+                        preview.Text = s;
+                    }));
+                    tmdf++;
+                    tmnow = Convert.ToInt64((tmdf - F * desv) * 1000000.0 / F);
+                    while (bpmptr < bpm.Count - 1 && tmc[bpmptr + 1] < Convert.ToDouble(tmnow))
+                    {
+                        bpmptr++;
+                    }
+                    tmm = Convert.ToInt32(((pairli)bpm[bpmptr]).x + (tmnow - tmc[bpmptr]) * 10000.0 / ((pairli)bpm[bpmptr]).y);
+                    lrcf++;
+                }
+                for (int i = 0; i < 5 * F; i++)
+                {
+                    string s = getstring(noteall, noteall, 600000000000.0 / resol / ((pairli)bpm[bpmptr]).y, 1.0 * (tmdf - F * desv) / F, notecnt - history[tmdf % F], 0, alltic, alltic, tmdf) + patt + "{'\\0'}";
+                    natsu.StandardInput.Write(s);
+                    natsu.StandardInput.Flush();
+                    List<byte> byteArray = new List<byte>();
+                    int ch = natsu.StandardOutput.BaseStream.ReadByte();
+                    while (ch != 0)
+                    {
+                        byteArray.Add((byte)ch);
+                        ch = natsu.StandardOutput.BaseStream.ReadByte();
+                    }
+                    s = Encoding.Default.GetString(byteArray.ToArray());
+                    newframe(W, H, s);
+                    Dispatcher.Invoke(new Action(() =>
+                    {
+                        prog.SetResourceReference(ContentProperty, "FrameRender");
+                        string str = (string)prog.Content;
+                        str = str.Replace("{frames}", tmdf.ToString());
+                        prog.Content = str;
+                        preview.Text = s;
+                    }));
+                    history[tmdf % F] = noteall;
+                    tmdf++;
+                }
+                Dispatcher.Invoke(new Action(() =>
+                {
+                    prog.SetResourceReference(ContentProperty, "Finished");
+                    preview.Text = "";
+                }));
+                ff.StandardInput.Close();
                 Dispatcher.Invoke(new Action(() =>
                 {
                     filename.IsEnabled = true;
                     prog.IsEnabled = true;
+                    Piliang.IsEnabled = true;
+                    canc.IsEnabled = false;
+                    width.IsEnabled = true;
+                    height.IsEnabled = true;
+                    fps.IsEnabled = true;
+                    pres.IsEnabled = true;
+                    des.IsEnabled = true;
+                }));
+            }
+            catch (ThreadAbortException)
+            {
+                Dispatcher.Invoke(new Action(() =>
+                {
+                    prog.SetResourceReference(ContentProperty, "Stopped");
+                    preview.Text = "";
+                    filename.IsEnabled = true;
+                    prog.IsEnabled = true;
+                    Piliang.IsEnabled = true;
+                    canc.IsEnabled = false;
+                    width.IsEnabled = true;
+                    height.IsEnabled = true;
+                    fps.IsEnabled = true;
+                    pres.IsEnabled = true;
+                    des.IsEnabled = true;
                 }));
                 return;
             }
-            string fileout = "";
-            SaveFileDialog getFileout = new SaveFileDialog
+            catch (Exception e)
             {
-                Filter = "MOV files (*.mov)|*.mov"
-            };
-            if ((bool)getFileout.ShowDialog())
-            {
-                fileout = getFileout.FileName;
-            }
-            else
-            {
-                return;
-            }
-            Dispatcher.Invoke(new Action(() =>
-            {
-                patt = pat.Text;
-                fonsel = (string)((ComboBoxItem)font.SelectedItem).Content;
-                fonsz = (int)fsize.Value;
-                colsel = ((SolidColorBrush)color.Background);
-            }));
-            int W = 0, H = 0, F = 0, desv = 0;
-            Dispatcher.Invoke(new Action(() =>
-            {
-                W = (int)width.Value; H = (int)height.Value; F = (int)fps.Value;
-                desv = (int)des.Value;
-            }));
-            Stream inppp = File.Open(filein, FileMode.Open, FileAccess.Read, FileShare.Read);
-            while (!filein.EndsWith(".mid") && !filein.EndsWith(".cjcmcg"))
-            {
-                if (filein.EndsWith(".xz"))
-                {
-                    inppp = AddXZLayer(inppp);
-                    filein = filein.Substring(0, filein.Length - 3);
-                }
-                else if (filein.EndsWith(".zip"))
-                {
-                    inppp = AddZipLayer(inppp);
-                }
-                else if (filein.EndsWith(".rar"))
-                {
-                    inppp = AddRarLayer(inppp);
-                }
-                else if (filein.EndsWith(".7z"))
-                {
-                    inppp = Add7zLayer(inppp);
-                }
-                else if (filein.EndsWith(".tar"))
-                {
-                    inppp = AddTarLayer(inppp);
-                }
-                else if (filein.EndsWith(".gz"))
-                {
-                    inppp = AddGZLayer(inppp);
-                }
-            }
-            BufferedStream inpp = new BufferedStream(inppp, 16777216);
-            int ReadByte()
-            {
-                int b = inpp.ReadByte();
-                if (b == -1)
-                {
-                    throw new Exception("Unexpected file end");
-                }
-
-                return b;
-            }
-            ArrayList nts = new ArrayList(), nto = new ArrayList();
-            ArrayList lrcs = new ArrayList();
-            ArrayList bpm = new ArrayList();
-            bool isPre = filein.EndsWith(".cjcmcg");
-            long noteall = 0;
-            int alltic = 0;
-            if (!isPre)
-            {
-                for (int i = 0; i < 4; ++i)
-                {
-                    ReadByte();
-                }
-                for (int i = 0; i < 4; ++i)
-                {
-                    ReadByte();
-                }
-                ReadByte();
-                ReadByte();
-                int trkcnt;
-                trkcnt = (toint(ReadByte()) * 256) + toint(ReadByte());
-                resol = (toint(ReadByte()) * 256) + toint(ReadByte());
-                bpm.Add(new pairli(0, 5000000000.0 / resol, -1, 0));
-                int nowtrk = 1;
-                int allticreal = 0;
-                lrcs.Add(new pairls(0, "", -1, -1));
-                for (int trk = 0; trk < trkcnt; trk++)
-                {
-                    int bpmcnt = 0;
-                    int lrccnt = 0;
-                    long notes = 0;
-                    long leng = 0;
-                    ReadByte();
-                    ReadByte();
-                    ReadByte();
-                    ReadByte();
-                    for (int i = 0; i < 4; i++)
-                    {
-                        leng = leng * 256 + toint(ReadByte());
-                    }
-                    int lstcmd = 256;
-                    Dispatcher.Invoke(new Action(() =>
-                    {
-                        string str = prog.Uid;
-                        str = str.Replace("{trackcount}", (trk + 1).ToString() + "/" + trkcnt.ToString()).Replace("{tracksize}", leng.ToString("N0"));
-                        prog.Content = str;
-                    }));
-                    int getnum()
-                    {
-                        int ans = 0;
-                        int ch = 256;
-                        while (ch >= 128)
-                        {
-                            ch = toint(ReadByte());
-                            leng--;
-                            ans = ans * 128 + (ch & 0b01111111);
-                        }
-                        return ans;
-                    }
-                    int get()
-                    {
-                        if (lstcmd != 256)
-                        {
-                            int lstcmd2 = lstcmd;
-                            lstcmd = 256;
-                            return lstcmd2;
-                        }
-                        leng--;
-                        return toint(ReadByte());
-                    }
-                    int TM = 0;
-                    int prvcmd = 256;
-                    while (true)
-                    {
-                        int added = getnum();
-                        TM += added;
-                        int cmd = ReadByte();
-                        leng--;
-                        if (cmd < 128)
-                        {
-                            lstcmd = cmd;
-                            cmd = prvcmd;
-                        }
-                        prvcmd = cmd;
-                        int cm = cmd & 0b11110000;
-                        if (cm == 0b10010000)
-                        {
-                            get();
-                            ReadByte();
-                            leng--;
-                            while (nts.Count <= TM)
-                            {
-                                nts.Add(0L);
-                            }
-                            while (nto.Count <= TM)
-                            {
-                                nto.Add(0L);
-                            }
-                            nts[TM] = (Convert.ToInt64(nts[TM]) + 1L);
-                            notes++;
-                        }
-                        else if (cm == 0b10000000)
-                        {
-                            get();
-                            ReadByte();
-                            leng--;
-                            while (nts.Count <= TM)
-                            {
-                                nts.Add(0L);
-                            }
-                            while (nto.Count <= TM)
-                            {
-                                nto.Add(0L);
-                            }
-                            nto[TM] = (Convert.ToInt64(nto[TM]) + 1L);
-                        }
-                        else if (cm == 0b11000000 || cm == 0b11010000 || cmd == 0b11110011)
-                        {
-                            get();
-                        }
-                        else if (cm == 0b11100000 || cm == 0b10110000 || cmd == 0b11110010 || cm == 0b10100000)
-                        {
-                            get();
-                            ReadByte();
-                            leng--;
-                        }
-                        else if (cmd == 0b11110000)
-                        {
-                            if (get() == 0b11110111)
-                            {
-                                continue;
-                            }
-                            do
-                            {
-                                leng--;
-                            } while (ReadByte() != 0b11110111);
-                        }
-                        else if (cmd == 0b11110100 || cmd == 0b11110001 || cmd == 0b11110101 || cmd == 0b11111001 || cmd == 0b11111101 || cmd == 0b11110110 || cmd == 0b11110111 || cmd == 0b11111000 || cmd == 0b11111010 || cmd == 0b11111100 || cmd == 0b11111110)
-                        {
-                        }
-                        else if (cmd == 0b11111111)
-                        {
-                            cmd = get();
-                            if (cmd == 0)
-                            {
-                                ReadByte(); ReadByte(); ReadByte();
-                                leng -= 3;
-                            }
-                            else if (cmd >= 1 && cmd <= 10 && cmd != 5 || cmd == 0x7f)
-                            {
-                                long ff = getnum();
-                                while (ff-- > 0)
-                                {
-                                    ReadByte();
-                                    leng--;
-                                }
-                            }
-                            else if (cmd == 0x20 || cmd == 0x21)
-                            {
-                                ReadByte(); ReadByte(); leng -= 2;
-                            }
-                            else if (cmd == 0x2f)
-                            {
-                                ReadByte();
-                                leng--;
-                                if (TM > allticreal)
-                                {
-                                    allticreal = TM;
-                                }
-                                TM -= added;
-                                break;
-                            }
-                            else if (cmd == 0x51)
-                            {
-                                bpmcnt++;
-                                ReadByte();
-                                leng--;
-                                int BPM = get();
-                                BPM = BPM * 256 + get();
-                                BPM = BPM * 256 + get();
-                                bpm.Add(new pairli(TM, 10000.0 * BPM / resol, trk, bpmcnt));
-                            }
-                            else if (cmd == 5)
-                            {
-                                Encoding gb2312 = Encoding.GetEncoding("GBK");
-                                Encoding def = Encoding.GetEncoding("UTF-8");
-                                lrccnt++;
-                                int ff = getnum();
-                                byte[] S = new byte[ff];
-                                int cnt = 0;
-                                while (ff-- > 0)
-                                {
-                                    S[cnt++] = Convert.ToByte(ReadByte());
-                                    leng--;
-                                }
-                                S = Encoding.Convert(gb2312, def, S);
-                                lrcs.Add(new pairls(TM, def.GetString(S), trk, lrccnt));
-                            }
-                            else if (cmd == 0x54 || cmd == 0x58)
-                            {
-                                ReadByte(); ReadByte(); ReadByte(); ReadByte(); ReadByte();
-                                leng -= 5;
-                            }
-                            else if (cmd == 0x59)
-                            {
-                                ReadByte(); ReadByte(); ReadByte();
-                                leng -= 3;
-                            }
-                            else if (cmd == 0x0a)
-                            {
-                                int ss = get();
-                                while (ss-- > 0)
-                                {
-                                    ReadByte();
-                                    leng--;
-                                }
-                            }
-                        }
-                    }
-                    while (leng > 0)
-                    {
-                        ReadByte();
-                        leng--;
-                    }
-                    noteall += notes;
-                    nowtrk++;
-                }
+                MessageBox.Show(e.Message, "Error!");
                 Dispatcher.Invoke(new Action(() =>
                 {
-                    prog.SetResourceReference(ContentProperty, "ReadFinished");
-                    string str = (string)prog.Content;
-                    str = str.Replace("{notecnt}", noteall.ToString("N0"));
-                    prog.Content = str;
+                    prog.SetResourceReference(ContentProperty, "Failed");
+                    preview.Text = "";
+                    filename.IsEnabled = true;
+                    prog.IsEnabled = true;
+                    Piliang.IsEnabled = true;
+                    canc.IsEnabled = false;
+                    width.IsEnabled = true;
+                    height.IsEnabled = true;
+                    fps.IsEnabled = true;
+                    pres.IsEnabled = true;
+                    des.IsEnabled = true;
                 }));
-                alltic = nto.Count;
             }
-            else
-            {
-                resol = 0;
-                for (int i = 0; i < 4; i++)
-                {
-                    resol = resol * 256 + toint(ReadByte());
-                }
-                int bpmcnt = 0;
-                for (int i = 0; i < 4; i++)
-                {
-                    bpmcnt = bpmcnt * 256 + toint(ReadByte());
-                }
-                for (int i = 0; i < bpmcnt; i++)
-                {
-                    int Tm = toint(ReadByte());
-                    Tm = Tm * 256 + toint(ReadByte());
-                    Tm = Tm * 256 + toint(ReadByte());
-                    Tm = Tm * 256 + toint(ReadByte());
-                    int BPM = toint(ReadByte());
-                    BPM = BPM * 256 + toint(ReadByte());
-                    BPM = BPM * 256 + toint(ReadByte());
-                    bpm.Add(new pairli(Tm, 10000.0 * BPM / resol, 0, i));
-                }
-                int lrccnt = 0;
-                for (int i = 0; i < 4; i++)
-                {
-                    lrccnt = lrccnt * 256 + toint(ReadByte());
-                }
-                for (int i = 0; i < lrccnt; i++)
-                {
-                    int Tm = toint(ReadByte());
-                    Tm = Tm * 256 + toint(ReadByte());
-                    Tm = Tm * 256 + toint(ReadByte());
-                    Tm = Tm * 256 + toint(ReadByte());
-                    int Siz = toint(ReadByte());
-                    Siz = Siz * 256 + toint(ReadByte());
-                    Siz = Siz * 256 + toint(ReadByte());
-                    Siz = Siz * 256 + toint(ReadByte());
-                    List<byte> arr = new List<byte>();
-                    for (int j = 0; j < Siz; j++)
-                    {
-                        arr.Add((byte)ReadByte());
-                    }
-
-                    lrcs.Add(new pairls(Tm, Encoding.UTF8.GetString(arr.ToArray()), 0, i));
-                }
-                noteall = getNum();
-                alltic = 0;
-                for (int i = 0; i < 4; i++)
-                {
-                    alltic = alltic * 256 + toint(ReadByte());
-                }
-            }
-            bpm.Sort(new AhhShitPairliCompare());
-            lrcs.Sort(new AhhShitPairlsCompare());
-            double[] tmc = new double[bpm.Count];
-            tmc[0] = 0;
-            for (int i = 1; i < bpm.Count; i++)
-            {
-                tmc[i] = tmc[i - 1] + (((pairli)bpm[i]).x - ((pairli)bpm[i - 1]).x) * ((pairli)bpm[i - 1]).y / 10000.0;
-            }
-            Process natsu = Natsulang();
-            if (natsu == null)
-            {
-                return;
-            }
-            ff = startNewSSFF(W, H, F, fileout);
-            int tmdf = 0;
-            for (int i = 0; i < F * desv; i++)
-            {
-                string s = getstring(0, noteall, 120, 0, 0, 0, 0, alltic, tmdf) + patt + "{'\\0'}";
-                natsu.StandardInput.Write(s);
-                natsu.StandardInput.Flush();
-                List<byte> byteArray = new List<byte>();
-                int ch = natsu.StandardOutput.BaseStream.ReadByte();
-                while (ch != 0)
-                {
-                    byteArray.Add((byte)ch);
-                    ch = natsu.StandardOutput.BaseStream.ReadByte();
-                }
-                s = Encoding.Default.GetString(byteArray.ToArray());
-                newframe(W, H, s);
-                Dispatcher.Invoke(new Action(() =>
-                {
-                    prog.SetResourceReference(ContentProperty, "FrameRender");
-                    string str = (string)prog.Content;
-                    str = str.Replace("{frames}", tmdf.ToString());
-                    prog.Content = str;
-                    preview.Text = s;
-                }));
-                tmdf++;
-            }
-            long tmnow = 0;
-            long[] history = new long[F];
-            long poly = 0;
-            int now = 0;
-            long notecnt = 0;
-            int tmm = 0, nowlrc = 0, bpmptr = 0;
-            long lrcf = 0;
-            long getNum()
-            {
-                long ans = 0;
-                int ch = 256;
-                while (ch >= 128)
-                {
-                    ch = toint(ReadByte());
-                    ans = ans * 128 + (ch & 0b01111111);
-                }
-                return ans;
-            }
-            while (now < alltic || poly > 0)
-            {
-                for (; now <= tmm; now++)
-                {
-                    if (now >= alltic)
-                    {
-                        break;
-                    }
-                    if (isPre)
-                    {
-                        long jar = getNum();
-                        notecnt += jar;
-                        poly += jar;
-                        poly -= getNum();
-                    }
-                    else
-                    {
-                        notecnt += Convert.ToInt64(nts[now]);
-                        poly += Convert.ToInt64(nts[now]);
-                        poly -= Convert.ToInt64(nto[now]);
-                    }
-                }
-                while (nowlrc < lrcs.Count - 1 && ((pairls)lrcs[nowlrc + 1]).x <= tmm)
-                {
-                    nowlrc++;
-                    lrcf = 0;
-                }
-                string s = getstring(notecnt, noteall, 600000000000.0 / resol / ((pairli)bpm[bpmptr]).y, 1.0 * (tmdf - F * desv) / F, notecnt - history[tmdf % F], poly, tmm > alltic ? alltic : Convert.ToInt64(tmm), alltic, tmdf, ((pairls)lrcs[nowlrc]).y, lrcf) + patt + "{'\\0'}";
-                natsu.StandardInput.Write(s);
-                natsu.StandardInput.Flush();
-                List<byte> byteArray = new List<byte>();
-                int ch = natsu.StandardOutput.BaseStream.ReadByte();
-                while (ch != 0)
-                {
-                    byteArray.Add((byte)ch);
-                    ch = natsu.StandardOutput.BaseStream.ReadByte();
-                }
-                s = Encoding.Default.GetString(byteArray.ToArray());
-                newframe(W, H, s);
-                history[tmdf % F] = notecnt;
-                Dispatcher.Invoke(new Action(() =>
-                {
-                    prog.SetResourceReference(ContentProperty, "FrameRender");
-                    string str = (string)prog.Content;
-                    str = str.Replace("{frames}", tmdf.ToString());
-                    prog.Content = str;
-                    preview.Text = s;
-                }));
-                tmdf++;
-                tmnow = Convert.ToInt64((tmdf - F * desv) * 1000000.0 / F);
-                while (bpmptr < bpm.Count - 1 && tmc[bpmptr + 1] < Convert.ToDouble(tmnow))
-                {
-                    bpmptr++;
-                }
-                tmm = Convert.ToInt32(((pairli)bpm[bpmptr]).x + (tmnow - tmc[bpmptr]) * 10000.0 / ((pairli)bpm[bpmptr]).y);
-                lrcf++;
-            }
-            for (int i = 0; i < 5 * F; i++)
-            {
-                string s = getstring(noteall, noteall, 600000000000.0 / resol / ((pairli)bpm[bpmptr]).y, 1.0 * (tmdf - F * desv) / F, notecnt - history[tmdf % F], 0, alltic, alltic, tmdf) + patt + "{'\\0'}";
-                natsu.StandardInput.Write(s);
-                natsu.StandardInput.Flush();
-                List<byte> byteArray = new List<byte>();
-                int ch = natsu.StandardOutput.BaseStream.ReadByte();
-                while (ch != 0)
-                {
-                    byteArray.Add((byte)ch);
-                    ch = natsu.StandardOutput.BaseStream.ReadByte();
-                }
-                s = Encoding.Default.GetString(byteArray.ToArray());
-                newframe(W, H, s);
-                Dispatcher.Invoke(new Action(() =>
-                {
-                    prog.SetResourceReference(ContentProperty, "FrameRender");
-                    string str = (string)prog.Content;
-                    str = str.Replace("{frames}", tmdf.ToString());
-                    prog.Content = str;
-                    preview.Text = s;
-                }));
-                history[tmdf % F] = noteall;
-                tmdf++;
-            }
-            Dispatcher.Invoke(new Action(() =>
-            {
-                prog.SetResourceReference(ContentProperty, "Finished");
-                preview.Text = "";
-            }));
-            ff.StandardInput.Close();
-            Dispatcher.Invoke(new Action(() =>
-            {
-                filename.IsEnabled = true;
-                prog.IsEnabled = true;
-            }));
         }
+
+        Thread thread;
+
         public void progress_Click(object sender, RoutedEventArgs e)
         {
             filein = (string)filename.Content;
             filename.IsEnabled = false;
             prog.IsEnabled = false;
-            Thread thread = new Thread(progress);
+            canc.IsEnabled = true;
+            Piliang.IsEnabled = false;
+            width.IsEnabled = false;
+            height.IsEnabled = false;
+            fps.IsEnabled = false;
+            pres.IsEnabled = false;
+            des.IsEnabled = false;
+            thread = new Thread(progress);
             thread.Start();
+        }
+
+        private void canc_Click(object sender, RoutedEventArgs e)
+        {
+            thread.Abort();
         }
     }
 }

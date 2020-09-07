@@ -24,9 +24,10 @@
         <DockPanel Height="25" LastChildFill="False" Margin="400,45,0,0" VerticalAlignment="Top">
             <Label Content="{DynamicResource Preset}" HorizontalAlignment="Left" VerticalAlignment="Top" DockPanel.Dock="Left"/>
             <ComboBox x:Name="pres" HorizontalAlignment="Left" Width="90" Height="25" VerticalAlignment="Top" DockPanel.Dock="Left" SelectionChanged="pres_SelectionChanged">
-                <ComboBoxItem Content="1080x320" Uid="1080x320" IsSelected="True"/>
+                <ComboBoxItem Content="1080x320" Uid="1080x320"/>
+                <ComboBoxItem Content="360P" Uid="360P"/>
                 <ComboBoxItem Content="720P" Uid="720P"/>
-                <ComboBoxItem Content="1080P" Uid="1080P"/>
+                <ComboBoxItem Content="1080P" Uid="1080P" IsSelected="True"/>
                 <ComboBoxItem Content="1440P" Uid="1440P"/>
                 <ComboBoxItem Content="4K" Uid="2160P"/>
                 <ComboBoxItem Content="5K" Uid="2880P"/>
@@ -36,7 +37,7 @@
             </ComboBox>
         </DockPanel>
         <Button Margin="0,45,10,0" VerticalAlignment="Top" Height="25" HorizontalAlignment="Right" Width="150" Content="{DynamicResource ReadHelp}" Click="help_Click"/>
-        <DockPanel Margin="10,80,220,45">
+        <DockPanel Margin="10,80,220,45" x:Name="Piliang">
             <DockPanel VerticalAlignment="Top" Height="25" Margin="0,0,0,0" DockPanel.Dock="Top">
                 <DockPanel Height="25" LastChildFill="False" Margin="0,0,0,0" VerticalAlignment="Top">
                     <Label Content="{DynamicResource PatSel}" HorizontalAlignment="Left" VerticalAlignment="Top" DockPanel.Dock="Left"/>
@@ -72,6 +73,7 @@
             <Label Content="{DynamicResource DelayStart}" HorizontalAlignment="Left" VerticalAlignment="Top" DockPanel.Dock="Left"/>
             <mdfk:DecimalUpDown x:Name="des" Value="3" Increment="1" Maximum="114514" Minimum="0" HorizontalAlignment="Left" Width="60" Height="25" VerticalAlignment="Top" DockPanel.Dock="Left" />
         </DockPanel>
-        <Button VerticalAlignment="Bottom" Height="25" Margin="10,0,10,10" x:Name="prog" Uid="{DynamicResource Parsingtrack}" Content="{DynamicResource Start}" Click="progress_Click"/>
+        <Button VerticalAlignment="Bottom" Height="25" Margin="10,0,220,10" x:Name="prog" Uid="{DynamicResource Parsingtrack}" Content="{DynamicResource Start}" Click="progress_Click"/>
+        <Button VerticalAlignment="Bottom" HorizontalAlignment="Right" Height="25" Margin="0,0,10,10" Width="200" x:Name="canc" Uid="{DynamicResource Parsingtrack}" Content="{DynamicResource Cancel}" IsEnabled="False" Click="canc_Click"/>
     </Grid>
 </Window>

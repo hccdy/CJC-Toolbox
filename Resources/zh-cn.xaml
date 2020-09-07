@@ -11,6 +11,7 @@
     <s:String x:Key="SaveGroup">保存组</s:String>
     <s:String x:Key="LoadGroup">加载组</s:String>
     <s:String x:Key="Start">开始!</s:String>
+    <s:String x:Key="Cancel">取消</s:String>
     <s:String x:Key="Save">保存!</s:String>
     <s:String x:Key="InfoWindowtitle">Midi信息</s:String>
     <s:String x:Key="StartWindowtitle">开始合并</s:String>
@@ -35,6 +36,8 @@
     <s:String x:Key="Midilen">Midi长度 (时间戳数):&#160;</s:String>
     <s:String x:Key="Getmoreinfo">获取更多信息</s:String>
     <s:String x:Key="Finished">完成</s:String>
+    <s:String x:Key="Failed">失败</s:String>
+    <s:String x:Key="Stopped">已取消</s:String>
     <s:String x:Key="Parsingtrack">读取第{trackcount}个音轨，{tracksize}字节</s:String>
     <s:String x:Key="UnableGroup">无法获取组文件的更多信息</s:String>
     <s:String x:Key="Clickgetinfo">(点击下方"获取更多信息"以获取)</s:String>
@@ -51,7 +54,7 @@
     <s:String x:Key="Prereading">预读取第{trackcount}个音轨</s:String>
     <s:String x:Key="SuccessfullyOutput" xml:space="preserve">成功将文件输出至</s:String>
     <s:String x:Key="CJCMCGtitle">蒟蒻果冻charlieyan的MIDI计数君生成器</s:String>
-    <s:String x:Key="CJCMCGInfo" xml:space="preserve">蒟蒻果冻charlieyan的MIDI计数君生成器&#10;一个用来快速生成MIDI计数君的软件。&#10;由花抄抄大爷和双笙黑粉后援会制作。</s:String>
+    <s:String x:Key="CJCMCGInfo" xml:space="preserve">蒟蒻果冻charlieyan的MIDI计数君生成器&#10;CJC Apps的代表作，一个用来快速生成MIDI计数君的软件。&#10;由花抄抄大爷和双笙黑粉后援会制作。</s:String>
     <s:String x:Key="SelectFile">选择文件</s:String>
     <s:String x:Key="Width">宽度</s:String>
     <s:String x:Key="Height">高度</s:String>
